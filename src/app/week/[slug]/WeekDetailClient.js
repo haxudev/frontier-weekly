@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
   const { language } = useLanguage()
+  const contentMaxWidth = language === 'en' ? 'max-w-4xl' : 'max-w-3xl'
 
   const t = {
     title: {
@@ -23,10 +24,13 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
     <div className="min-h-screen">
       {/* Hero Section - Fixed Title */}
       <section className="pt-20 pb-8 px-4">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className={`${contentMaxWidth} mx-auto text-center`}>
           <h1 
             className="text-4xl sm:text-5xl font-serif font-semibold mb-4 animate-fade-in"
-            style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}
+            style={{
+              color: 'var(--text-primary)',
+              fontFamily: language === 'en' ? 'var(--font-serif-en)' : 'var(--font-serif)',
+            }}
           >
             {t.title[language]}
           </h1>
@@ -45,7 +49,7 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
 
       {/* Week Navigator - Left Aligned */}
       <section className="px-4 pb-6">
-        <div className="max-w-3xl mx-auto">
+        <div className={`${contentMaxWidth} mx-auto`}>
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <WeekDots weeks={recentWeeks} currentSlug={currentSlug} />
           </div>
@@ -54,7 +58,7 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
 
       {/* Main Content */}
       <section className="pb-20 px-4">
-        <div className="max-w-3xl mx-auto">
+        <div className={`${contentMaxWidth} mx-auto`}>
           <article 
             className="card p-8 sm:p-10 animate-fade-in"
             style={{ animationDelay: '0.3s' }}
@@ -72,6 +76,7 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
             {/* Pure Markdown Content Only */}
             <div 
               className="markdown-content"
+              lang={language}
               dangerouslySetInnerHTML={{ __html: week.contentHtml }}
             />
           </article>

@@ -86,6 +86,31 @@ body {
   text-indent: 2em;
 }
 
+/* English content: no first-line indent */
+.markdown-content[lang="en"] > p {
+  text-indent: 0;
+}
+
+/* English typography tuning: more breathable headings */
+.markdown-content[lang="en"] h1,
+.markdown-content[lang="en"] h2,
+.markdown-content[lang="en"] h3,
+.markdown-content[lang="en"] h4 {
+  font-family: var(--font-serif-en);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.markdown-content[lang="en"] h2 {
+  font-size: clamp(1.35rem, 1.2vw + 1.05rem, 2.1rem);
+  line-height: 1.5;
+  margin-top: 2.75rem;
+  margin-bottom: 1.1rem;
+  letter-spacing: -0.015em;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
 .markdown-content ul {
   @apply my-4 pl-5 space-y-2;
   list-style: none;

@@ -11,6 +11,7 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
   const pathname = usePathname() || '/'
   const isEn = pathname === '/en' || pathname.startsWith('/en/')
   const prefix = isEn ? '/en' : ''
+  const contentMaxWidth = language === 'en' ? 'max-w-4xl' : 'max-w-3xl'
 
   const t = {
     title: {
@@ -35,10 +36,13 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
     <div className="min-h-screen">
       {/* Hero Section - Fixed Title */}
       <section className="pt-20 pb-8 px-4">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className={`${contentMaxWidth} mx-auto text-center`}>
           <h1 
             className="text-4xl sm:text-5xl font-serif font-semibold mb-4 animate-fade-in"
-            style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}
+            style={{
+              color: 'var(--text-primary)',
+              fontFamily: language === 'en' ? 'var(--font-serif-en)' : 'var(--font-serif)',
+            }}
           >
             {t.title[language]}
           </h1>
@@ -57,7 +61,7 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
 
       {/* Week Navigator - Left Aligned */}
       <section className="px-4 pb-6">
-        <div className="max-w-3xl mx-auto">
+        <div className={`${contentMaxWidth} mx-auto`}>
           {recentWeeks.length > 0 && (
             <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <WeekDots weeks={recentWeeks} currentSlug={latestWeek?.slug} />
@@ -68,7 +72,7 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
 
       {/* Main Content - Pure Markdown */}
       <section className="pb-20 px-4">
-        <div className="max-w-3xl mx-auto">
+        <div className={`${contentMaxWidth} mx-auto`}>
           {latestWeek ? (
             <article 
               className="card p-8 sm:p-10 animate-fade-in"
@@ -88,6 +92,7 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
               {latestWeek.contentHtml && (
                 <div 
                   className="markdown-content"
+                  lang={language}
                   dangerouslySetInnerHTML={{ __html: latestWeek.contentHtml }}
                 />
               )}

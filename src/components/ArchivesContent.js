@@ -10,6 +10,7 @@ export default function ArchivesContent({ allWeeks }) {
   const pathname = usePathname() || '/'
   const isEn = pathname === '/en' || pathname.startsWith('/en/')
   const prefix = isEn ? '/en' : ''
+  const contentMaxWidth = language === 'en' ? 'max-w-4xl' : 'max-w-3xl'
 
   const t = {
     title: {
@@ -64,7 +65,7 @@ export default function ArchivesContent({ allWeeks }) {
     <div className="min-h-screen">
       {/* Header */}
       <section className="pt-20 pb-8 px-4">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className={`${contentMaxWidth} mx-auto text-center`}>
           <Link 
             href={prefix || '/'}
             className="inline-block mb-6 text-sm transition-colors duration-200"
@@ -75,7 +76,10 @@ export default function ArchivesContent({ allWeeks }) {
 
           <h1 
             className="text-3xl sm:text-4xl font-serif font-semibold animate-fade-in"
-            style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}
+            style={{
+              color: 'var(--text-primary)',
+              fontFamily: language === 'en' ? 'var(--font-serif-en)' : 'var(--font-serif)',
+            }}
           >
             {t.title[language]}
           </h1>
@@ -88,7 +92,7 @@ export default function ArchivesContent({ allWeeks }) {
 
       {/* Archives List */}
       <section className="pb-20 px-4">
-        <div className="max-w-3xl mx-auto">
+        <div className={`${contentMaxWidth} mx-auto`}>
           {years.length > 0 ? (
             <div className="space-y-10">
               {years.map((year, yearIndex) => (
@@ -101,7 +105,10 @@ export default function ArchivesContent({ allWeeks }) {
                   <div className="flex items-center gap-3 mb-6">
                     <span 
                       className="text-2xl font-serif font-semibold"
-                      style={{ color: 'var(--accent)', fontFamily: 'var(--font-serif)' }}
+                      style={{
+                        color: 'var(--accent)',
+                        fontFamily: language === 'en' ? 'var(--font-serif-en)' : 'var(--font-serif)',
+                      }}
                     >
                       {year}
                     </span>
