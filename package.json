@@ -4,7 +4,7 @@
   "description": "Weekly Analysis Brief - 科技研究周报",
   "private": true,
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=20.9.0 <21"
   },
   "scripts": {
     "dev": "next dev",
