@@ -146,6 +146,84 @@ body {
   border-bottom-color: var(--accent);
 }
 
+/* Compact citation links: render as subtle superscripts with hover tooltip */
+.markdown-content a[data-cite] {
+  color: var(--text-muted);
+  border-bottom: none;
+  vertical-align: super;
+  font-size: 0.78em;
+  font-weight: 600;
+  text-indent: 0;
+  position: relative;
+  padding: 0 0.08em;
+  letter-spacing: 0.01em;
+}
+
+.markdown-content a[data-cite]:hover {
+  color: var(--accent);
+  border-bottom: none;
+}
+
+.markdown-content a[data-cite]:focus-visible {
+  outline: 2px solid rgba(184, 134, 11, 0.35);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.markdown-content a[data-cite]:hover::after,
+.markdown-content a[data-cite]:focus-visible::after,
+.markdown-content a[data-cite][data-cite-open="true"]::after {
+  content: attr(data-cite-title);
+  position: absolute;
+  left: 50%;
+  bottom: 1.5em;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(420px, 82vw);
+  white-space: normal;
+  z-index: 50;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+  line-height: 1.4;
+}
+
+.markdown-content a[data-cite]:hover::before,
+.markdown-content a[data-cite]:focus-visible::before,
+.markdown-content a[data-cite][data-cite-open="true"]::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 1.15em;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--border);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .markdown-content a[data-cite] {
+    vertical-align: baseline;
+    font-size: 0.9em;
+  }
+
+  .markdown-content a[data-cite][data-cite-open="true"]::after {
+    position: fixed;
+    left: 50%;
+    bottom: 1.1rem;
+    transform: translateX(-50%);
+    max-width: min(520px, 92vw);
+    padding: 0.65rem 0.8rem;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+  }
+
+  .markdown-content a[data-cite][data-cite-open="true"]::before {
+    content: none;
+  }
+}
+
 .markdown-content blockquote {
   @apply pl-4 my-6 italic;
   border-left: 2px solid var(--accent);

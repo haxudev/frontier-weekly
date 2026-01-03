@@ -5,6 +5,35 @@ import { remark } from 'remark'
 import html from 'remark-html'
 import gfm from 'remark-gfm'
 
+function escapeHtmlAttribute(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function compactCitationLinks(contentHtml) {
+  if (typeof contentHtml !== 'string' || !contentHtml) return contentHtml
+
+  // Convert links like: <a ...>[2]Title</a> into a compact citation marker.
+  // We keep the title in a data attribute so CSS can show a tooltip on hover/focus.
+  return contentHtml.replace(
+    /<a\b([^>]*?)>(\s*\[(\d+)\]([\s\S]*?))<\/a>/g,
+    (match, attrs, fullText, citeNumber, restText) => {
+      const titleText = String(restText || '').trim()
+      const escapedTitle = escapeHtmlAttribute(titleText)
+      const escapedAria = escapeHtmlAttribute(`[${citeNumber}] ${titleText}`.trim())
+
+      // If this anchor is already processed, keep it.
+      if (/\bdata-cite=/.test(attrs)) return match
+
+      return `<a${attrs} data-cite="${citeNumber}" data-cite-title="${escapedTitle}" data-cite-open="false" aria-label="${escapedAria}" aria-expanded="false">[${citeNumber}]</a>`
+    }
+  )
+}
+
 function getWeeksDirectory(locale = 'zh') {
   if (locale === 'en') {
     return path.join(process.cwd(), 'content/en')
@@ -120,6 +149,9 @@ export async function getWeekContent(slug, locale = 'zh') {
     .process(week.content)
 
   let contentHtml = processedContent.toString()
+
+  // Make dense citation lists less wordy: show only [n] and keep the title in a tooltip.
+  contentHtml = compactCitationLinks(contentHtml)
 
   // Add IDs to headings for table of contents
   let headingIndex = 0

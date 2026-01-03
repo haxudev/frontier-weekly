@@ -4,10 +4,62 @@ import WeekDots from '@/components/WeekDots'
 import BackToTop from '@/components/BackToTop'
 import LanguageToggle from '@/components/LanguageToggle'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { useEffect, useRef } from 'react'
 
 export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
   const { language } = useLanguage()
   const contentMaxWidth = language === 'en' ? 'max-w-4xl' : 'max-w-3xl'
+  const contentRef = useRef(null)
+
+  useEffect(() => {
+    const rootEl = contentRef.current
+    if (!rootEl) return
+    if (!isCoarsePointer()) return
+
+    // Ensure deterministic initial state
+    const citeLinks = rootEl.querySelectorAll('a[data-cite]')
+    citeLinks.forEach((el) => {
+      if (!el.hasAttribute('data-cite-open')) el.setAttribute('data-cite-open', 'false')
+      if (!el.hasAttribute('aria-expanded')) el.setAttribute('aria-expanded', 'false')
+    })
+
+    const onRootClick = (e) => {
+      const target = e.target
+      const citeEl = target?.closest?.('a[data-cite]')
+
+      if (!citeEl || !rootEl.contains(citeEl)) {
+        closeAllCitations(rootEl)
+        return
+      }
+
+      const isOpen = citeEl.getAttribute('data-cite-open') === 'true'
+
+      // First tap: open tooltip, don't navigate
+      if (!isOpen) {
+        e.preventDefault()
+        closeAllCitations(rootEl)
+        citeEl.setAttribute('data-cite-open', 'true')
+        citeEl.setAttribute('aria-expanded', 'true')
+      }
+      // Second tap: allow navigation
+    }
+
+    const onOutsideClick = (e) => {
+      if (!rootEl.contains(e.target)) closeAllCitations(rootEl)
+    }
+
+    const onScroll = () => closeAllCitations(rootEl)
+
+    rootEl.addEventListener('click', onRootClick)
+    document.addEventListener('click', onOutsideClick)
+    window.addEventListener('scroll', onScroll, { passive: true })
+
+    return () => {
+      rootEl.removeEventListener('click', onRootClick)
+      document.removeEventListener('click', onOutsideClick)
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [week?.contentHtml])
 
   const t = {
     title: {
@@ -77,6 +129,7 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
             <div 
               className="markdown-content"
               lang={language}
+              ref={contentRef}
               dangerouslySetInnerHTML={{ __html: week.contentHtml }}
             />
           </article>
@@ -109,3 +162,21 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
     </div>
   )
 }
+
+function isCoarsePointer() {
+  if (typeof window === 'undefined') return false
+  return Boolean(
+    window.matchMedia &&
+      window.matchMedia('(hover: none) and (pointer: coarse)').matches
+  )
+}
+
+function closeAllCitations(rootEl) {
+  if (!rootEl) return
+  const openEls = rootEl.querySelectorAll('a[data-cite][data-cite-open="true"]')
+  openEls.forEach((el) => {
+    el.setAttribute('data-cite-open', 'false')
+    el.setAttribute('aria-expanded', 'false')
+  })
+}
+
