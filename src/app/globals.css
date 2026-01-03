@@ -1,0 +1,256 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #f5f0e8;
+  --bg-secondary: #ebe5d9;
+  --bg-card: #ffffff;
+  --text-primary: #2d2a26;
+  --text-secondary: #5c5650;
+  --text-muted: #8a847a;
+  --accent: #b8860b;
+  --accent-light: #d4a84b;
+  --border: #e0d9cc;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* Custom scrollbar - subtle */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1c9b8;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b8b0a0;
+}
+
+/* Selection */
+::selection {
+  background: rgba(184, 134, 11, 0.2);
+}
+
+/* Markdown content styles - Wabi-sabi aesthetic */
+.markdown-content h1 {
+  @apply text-2xl sm:text-3xl font-semibold mt-2 mb-6 pb-4 text-center tracking-wide;
+  font-family: var(--font-serif);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.markdown-content h2 {
+  @apply text-xl sm:text-2xl font-semibold mt-10 mb-4;
+  font-family: var(--font-serif);
+  color: var(--accent);
+}
+
+.markdown-content h3 {
+  @apply text-base sm:text-lg font-semibold mt-8 mb-4 px-3 py-2 rounded;
+  font-family: var(--font-serif);
+  background: rgba(235, 229, 217, 0.7);
+  border-left: 3px solid var(--accent);
+  color: var(--text-primary);
+}
+
+.markdown-content h4 {
+  @apply text-base font-medium mt-6 mb-2;
+  font-family: var(--font-serif);
+  color: var(--text-secondary);
+}
+
+.markdown-content p {
+  @apply my-4 leading-relaxed;
+  color: var(--text-secondary);
+}
+
+/* Plain paragraphs: 2 Chinese-character first-line indent */
+.markdown-content > p {
+  text-indent: 2em;
+}
+
+.markdown-content ul {
+  @apply my-4 pl-5 space-y-2;
+  list-style: none;
+}
+
+.markdown-content ul li {
+  @apply relative pl-4;
+}
+
+.markdown-content ul li::before {
+  content: "•";
+  @apply absolute left-0;
+  color: var(--accent);
+}
+
+.markdown-content ol {
+  @apply my-4 pl-6 list-decimal;
+  color: var(--text-secondary);
+}
+
+.markdown-content li {
+  @apply my-2 leading-relaxed;
+}
+
+.markdown-content a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.markdown-content a:hover {
+  border-bottom-color: var(--accent);
+}
+
+.markdown-content blockquote {
+  @apply pl-4 my-6 italic;
+  border-left: 2px solid var(--accent);
+  color: var(--text-muted);
+}
+
+.markdown-content code {
+  @apply px-1.5 py-0.5 rounded text-sm font-mono;
+  background: var(--bg-secondary);
+  color: var(--accent);
+}
+
+.markdown-content pre {
+  @apply p-4 rounded-lg overflow-x-auto my-6;
+  background: #2d2a26;
+}
+
+.markdown-content pre code {
+  @apply bg-transparent p-0;
+  color: #e8e2d6;
+}
+
+.markdown-content table {
+  @apply w-full my-6;
+  border-collapse: collapse;
+}
+
+.markdown-content th {
+  @apply px-4 py-3 text-left text-sm font-medium;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.markdown-content td {
+  @apply px-4 py-3 text-sm;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.markdown-content hr {
+  @apply my-10;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.markdown-content strong {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+}
+
+.markdown-content b {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+}
+
+/* Keywords pills */
+.keyword-row {
+  @apply flex flex-wrap gap-2 items-center justify-start;
+}
+
+.keyword-pill {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+  background: rgba(235, 229, 217, 0.9);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+/* Week dot indicator */
+.week-dot {
+  @apply w-4 h-4 rounded-full cursor-pointer transition-all duration-200;
+  background: var(--border);
+}
+
+.week-dot:hover {
+  background: var(--accent-light);
+  transform: scale(1.2);
+}
+
+.week-dot.active {
+  background: var(--accent);
+  transform: scale(1.1);
+}
+
+.week-dot-group {
+  @apply flex items-center justify-center gap-3;
+}
+
+/* Week pill navigation */
+.week-pill {
+  @apply px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap;
+  cursor: pointer;
+}
+
+.week-pill:hover {
+  background: var(--bg-secondary) !important;
+  transform: scale(1.02);
+}
+
+/* Tag styles */
+.tag {
+  @apply inline-flex items-center px-2.5 py-1 rounded text-xs font-medium;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.tag-accent {
+  background: rgba(184, 134, 11, 0.15);
+  color: var(--accent);
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Card style */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  @apply rounded-lg;
+}
