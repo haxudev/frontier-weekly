@@ -209,19 +209,39 @@ body {
     font-size: 0.9em;
   }
 
-  .markdown-content a[data-cite][data-cite-open="true"]::after {
-    position: fixed;
-    left: 50%;
-    bottom: 1.1rem;
-    transform: translateX(-50%);
-    max-width: min(520px, 92vw);
-    padding: 0.65rem 0.8rem;
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
-  }
-
+  /* Mobile uses a real popover element for clickable navigation. */
+  .markdown-content a[data-cite][data-cite-open="true"]::after,
   .markdown-content a[data-cite][data-cite-open="true"]::before {
     content: none;
   }
+}
+
+/* Mobile citation popover (created via JS) */
+.cite-popover {
+  position: fixed;
+  left: 50%;
+  bottom: 1.1rem;
+  transform: translateX(-50%);
+  z-index: 60;
+  width: min(560px, 92vw);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+}
+
+.cite-popover-link {
+  display: block;
+  padding: 0.75rem 0.85rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-bottom: none;
+  line-height: 1.35;
+}
+
+.cite-popover-link:active,
+.cite-popover-link:hover {
+  color: var(--accent);
 }
 
 .markdown-content blockquote {

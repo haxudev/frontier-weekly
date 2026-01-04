@@ -16,6 +16,33 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
     if (!rootEl) return
     if (!isCoarsePointer()) return
 
+    const { popoverEl, linkEl } = ensureCitePopover()
+    let activeCiteEl = null
+
+    const closePopover = () => {
+      if (activeCiteEl) {
+        activeCiteEl.setAttribute('data-cite-open', 'false')
+        activeCiteEl.setAttribute('aria-expanded', 'false')
+      }
+      activeCiteEl = null
+      popoverEl.setAttribute('hidden', '')
+    }
+
+    const openPopover = (citeEl) => {
+      closePopover()
+
+      const title = citeEl.getAttribute('data-cite-title') || ''
+      const href = citeEl.getAttribute('href') || ''
+
+      activeCiteEl = citeEl
+      activeCiteEl.setAttribute('data-cite-open', 'true')
+      activeCiteEl.setAttribute('aria-expanded', 'true')
+
+      linkEl.textContent = title || href
+      linkEl.href = citeEl.href
+      popoverEl.removeAttribute('hidden')
+    }
+
     // Ensure deterministic initial state
     const citeLinks = rootEl.querySelectorAll('a[data-cite]')
     citeLinks.forEach((el) => {
@@ -24,40 +51,56 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
     })
 
     const onRootClick = (e) => {
-      const target = e.target
-      const citeEl = target?.closest?.('a[data-cite]')
+      // iOS/Safari may set target to a Text node; normalize to an Element.
+      const targetEl =
+        e.target instanceof Element
+          ? e.target
+          : e.target?.parentElement instanceof Element
+            ? e.target.parentElement
+            : null
 
+      const citeEl = targetEl?.closest?.('a[data-cite]')
       if (!citeEl || !rootEl.contains(citeEl)) {
-        closeAllCitations(rootEl)
+        closePopover()
         return
       }
 
+      // Always prevent navigation on the marker itself on mobile.
+      e.preventDefault()
+
       const isOpen = citeEl.getAttribute('data-cite-open') === 'true'
-
-      // First tap: open tooltip, don't navigate
-      if (!isOpen) {
-        e.preventDefault()
-        closeAllCitations(rootEl)
-        citeEl.setAttribute('data-cite-open', 'true')
-        citeEl.setAttribute('aria-expanded', 'true')
+      if (isOpen) {
+        closePopover()
+      } else {
+        openPopover(citeEl)
       }
-      // Second tap: allow navigation
     }
 
-    const onOutsideClick = (e) => {
-      if (!rootEl.contains(e.target)) closeAllCitations(rootEl)
+    const onDocumentClick = (e) => {
+      const targetEl = e.target instanceof Element ? e.target : null
+      if (!targetEl) return
+
+      // Click on citation marker: handled by root listener.
+      if (targetEl.closest('a[data-cite]')) return
+
+      // Click on popover link should navigate; don't interfere.
+      if (popoverEl.contains(targetEl)) return
+
+      closePopover()
     }
 
-    const onScroll = () => closeAllCitations(rootEl)
+    const onScroll = () => closePopover()
 
-    rootEl.addEventListener('click', onRootClick)
-    document.addEventListener('click', onOutsideClick)
+    // Use capture so preventDefault reliably beats navigation.
+    rootEl.addEventListener('click', onRootClick, true)
+    document.addEventListener('click', onDocumentClick)
     window.addEventListener('scroll', onScroll, { passive: true })
 
     return () => {
-      rootEl.removeEventListener('click', onRootClick)
-      document.removeEventListener('click', onOutsideClick)
+      rootEl.removeEventListener('click', onRootClick, true)
+      document.removeEventListener('click', onDocumentClick)
       window.removeEventListener('scroll', onScroll)
+      closePopover()
     }
   }, [week?.contentHtml])
 
@@ -178,5 +221,28 @@ function closeAllCitations(rootEl) {
     el.setAttribute('data-cite-open', 'false')
     el.setAttribute('aria-expanded', 'false')
   })
+}
+
+function ensureCitePopover() {
+  let popoverEl = document.getElementById('cite-popover')
+  if (!popoverEl) {
+    popoverEl = document.createElement('div')
+    popoverEl.id = 'cite-popover'
+    popoverEl.className = 'cite-popover'
+    popoverEl.setAttribute('role', 'dialog')
+    popoverEl.setAttribute('aria-label', '引用来源')
+    popoverEl.setAttribute('hidden', '')
+
+    document.body.appendChild(popoverEl)
+  }
+
+  let linkEl = popoverEl.querySelector('a.cite-popover-link')
+  if (!linkEl) {
+    linkEl = document.createElement('a')
+    linkEl.className = 'cite-popover-link'
+    popoverEl.appendChild(linkEl)
+  }
+
+  return { popoverEl, linkEl }
 }
 
