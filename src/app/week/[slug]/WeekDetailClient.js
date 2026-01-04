@@ -14,10 +14,10 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
   useEffect(() => {
     const rootEl = contentRef.current
     if (!rootEl) return
-    if (!isCoarsePointer()) return
 
     const { popoverEl, linkEl } = ensureCitePopover()
     let activeCiteEl = null
+    let lastTouchTs = 0
 
     const closePopover = () => {
       if (activeCiteEl) {
@@ -50,55 +50,83 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
       if (!el.hasAttribute('aria-expanded')) el.setAttribute('aria-expanded', 'false')
     })
 
-    const onRootClick = (e) => {
-      // iOS/Safari may set target to a Text node; normalize to an Element.
-      const targetEl =
-        e.target instanceof Element
-          ? e.target
-          : e.target?.parentElement instanceof Element
-            ? e.target.parentElement
-            : null
+    const getTargetElement = (eventTarget) => {
+      if (eventTarget instanceof Element) return eventTarget
+      // iOS/Safari may set target to a Text node
+      if (eventTarget && eventTarget.nodeType === 3) return eventTarget.parentElement
+      return null
+    }
 
-      const citeEl = targetEl?.closest?.('a[data-cite]')
-      if (!citeEl || !rootEl.contains(citeEl)) {
-        closePopover()
-        return
-      }
+    const shouldHandleTouchCitations = () => {
+      if (typeof window === 'undefined') return false
+      const hasTouch =
+        (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) ||
+        'ontouchstart' in window
+      const noHover = window.matchMedia?.('(hover: none)')?.matches
+      const coarse = window.matchMedia?.('(pointer: coarse)')?.matches
+      return Boolean(hasTouch && (noHover || coarse))
+    }
 
-      // Always prevent navigation on the marker itself on mobile.
+    const interceptCitation = (e) => {
+      if (!shouldHandleTouchCitations()) return false
+
+      const targetEl = getTargetElement(e.target)
+      if (!targetEl) return false
+
+      // Clicking on popover link should navigate; don't interfere.
+      if (popoverEl.contains(targetEl)) return false
+
+      const citeEl = targetEl.closest('a[data-cite]')
+      if (!citeEl || !rootEl.contains(citeEl)) return false
+
+      // Always prevent navigation on the marker itself on touch devices.
       e.preventDefault()
+      e.stopPropagation()
+      if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation()
 
-      const isOpen = citeEl.getAttribute('data-cite-open') === 'true'
-      if (isOpen) {
+      if (activeCiteEl === citeEl) {
         closePopover()
       } else {
         openPopover(citeEl)
       }
+
+      return true
     }
 
-    const onDocumentClick = (e) => {
-      const targetEl = e.target instanceof Element ? e.target : null
+    const onTouchStartCapture = (e) => {
+      lastTouchTs = Date.now()
+      interceptCitation(e)
+    }
+
+    const onClickCapture = (e) => {
+      // If a touch just happened, this click is a synthetic follow-up; still prevent.
+      if (Date.now() - lastTouchTs < 800) {
+        if (interceptCitation(e)) return
+        return
+      }
+      interceptCitation(e)
+    }
+
+    const onDocumentClickBubble = (e) => {
+      const targetEl = getTargetElement(e.target)
       if (!targetEl) return
-
-      // Click on citation marker: handled by root listener.
-      if (targetEl.closest('a[data-cite]')) return
-
-      // Click on popover link should navigate; don't interfere.
       if (popoverEl.contains(targetEl)) return
-
+      if (rootEl.contains(targetEl) && targetEl.closest('a[data-cite]')) return
       closePopover()
     }
 
     const onScroll = () => closePopover()
 
-    // Use capture so preventDefault reliably beats navigation.
-    rootEl.addEventListener('click', onRootClick, true)
-    document.addEventListener('click', onDocumentClick)
+    // Capture listeners to reliably beat link navigation on mobile.
+    document.addEventListener('touchstart', onTouchStartCapture, { capture: true, passive: false })
+    document.addEventListener('click', onClickCapture, true)
+    document.addEventListener('click', onDocumentClickBubble)
     window.addEventListener('scroll', onScroll, { passive: true })
 
     return () => {
-      rootEl.removeEventListener('click', onRootClick, true)
-      document.removeEventListener('click', onDocumentClick)
+      document.removeEventListener('touchstart', onTouchStartCapture, true)
+      document.removeEventListener('click', onClickCapture, true)
+      document.removeEventListener('click', onDocumentClickBubble)
       window.removeEventListener('scroll', onScroll)
       closePopover()
     }
