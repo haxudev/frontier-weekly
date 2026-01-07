@@ -40,24 +40,77 @@ function fixCjkEmphasis(content) {
   return result
 }
 
-function compactCitationLinks(contentHtml) {
+// Extract citation titles from the "## 引用" section
+// Format (after Markdown → HTML):
+// <p>[1] <a href="url">Title</a><br>[2] <a href="url">Title 2</a> ...</p>
+// We need a robust parser that tolerates newlines, <br>, and trailing punctuation.
+function extractCitationTitles(contentHtml) {
+  if (typeof contentHtml !== 'string' || !contentHtml) return {}
+
+  /** @type {Record<string, { title: string, href: string }>} */
+  const citations = {}
+
+  // Locate the references heading first to avoid false positives elsewhere.
+  const headingMatch = contentHtml.match(/<h2[^>]*>\s*(引用|References?)\s*<\/h2>/i)
+  if (!headingMatch) return citations
+
+  const headingIndex = contentHtml.indexOf(headingMatch[0])
+  if (headingIndex === -1) return citations
+
+  // Slice from the heading to the next h2 (or end of document)
+  const afterHeading = contentHtml.slice(headingIndex + headingMatch[0].length)
+  const nextHeadingIndex = afterHeading.search(/<h2[^>]*>/i)
+  const refSection = nextHeadingIndex === -1 ? afterHeading : afterHeading.slice(0, nextHeadingIndex)
+
+  // Match patterns like: [1] <a href="url">Title</a>
+  // NOTE: remark-html often keeps multiple entries inside a single <p> separated by whitespace.
+  const refPattern = /\[(\d+)\]\s*<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi
+  let match
+  while ((match = refPattern.exec(refSection)) !== null) {
+    const num = match[1]
+    const href = (match[2] || '').trim()
+    const title = (match[3] || '').trim()
+    if (num && title) citations[num] = { title, href }
+  }
+
+  return citations
+}
+
+function compactCitationLinks(contentHtml, citationTitles = {}) {
   if (typeof contentHtml !== 'string' || !contentHtml) return contentHtml
 
-  // Convert links like: <a ...>[2]Title</a> into a compact citation marker.
-  // We keep the title in a data attribute so CSS can show a tooltip on hover/focus.
+  // Convert links like: <a href="url">1</a> or <a href="url">[1]</a>
+  // into a compact citation marker with title.
   return contentHtml.replace(
-    /<a\b([^>]*?)>(\s*\[(\d+)\]([\s\S]*?))<\/a>/g,
-    (match, attrs, fullText, citeNumber, restText) => {
-      const titleText = String(restText || '').trim()
-      const escapedTitle = escapeHtmlAttribute(titleText)
-      const escapedAria = escapeHtmlAttribute(`[${citeNumber}] ${titleText}`.trim())
-
+    /<a\b([^>]*?)>\s*(?:\[(\d+)\]|(\d+))\s*<\/a>/g,
+    (match, attrs, bracketNum, plainNum) => {
       // If this anchor is already processed, keep it.
       if (/\bdata-cite=/.test(attrs)) return match
+
+      const citeNumber = bracketNum || plainNum
+      if (!citeNumber) return match
+
+      const meta = citationTitles[citeNumber]
+      if (!meta || !meta.title) return match
+
+      const titleText = meta.title
+      const escapedTitle = escapeHtmlAttribute(titleText)
+      const escapedAria = escapeHtmlAttribute(`[${citeNumber}] ${titleText}`.trim())
 
       return `<a${attrs} data-cite="${citeNumber}" data-cite-title="${escapedTitle}" data-cite-open="false" aria-label="${escapedAria}" aria-expanded="false">[${citeNumber}]</a>`
     }
   )
+}
+
+// Remove the "## 引用" / "## References" section from rendered HTML
+function removeReferencesSection(contentHtml) {
+  if (typeof contentHtml !== 'string' || !contentHtml) return contentHtml
+
+  // Match h2 heading containing "引用" or "References" and everything after it until the end
+  // The h2 may or may not have attributes like id, class, etc.
+  const referencesPattern = /<h2[^>]*>\s*(?:引用|References?)\s*<\/h2>[\s\S]*$/i
+  
+  return contentHtml.replace(referencesPattern, '')
 }
 
 function getWeeksDirectory(locale = 'zh') {
@@ -203,8 +256,14 @@ export async function getWeekContent(slug, locale = 'zh') {
 
   let contentHtml = processedContent.toString()
 
+  // First, extract citation titles from the references section
+  const citationTitles = extractCitationTitles(contentHtml)
+
   // Make dense citation lists less wordy: show only [n] and keep the title in a tooltip.
-  contentHtml = compactCitationLinks(contentHtml)
+  contentHtml = compactCitationLinks(contentHtml, citationTitles)
+
+  // Remove the references section (## 引用) from the rendered content
+  contentHtml = removeReferencesSection(contentHtml)
 
   // Add IDs to headings for table of contents
   let headingIndex = 0
