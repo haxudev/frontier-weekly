@@ -21,7 +21,11 @@ html {
 body {
   color: var(--text-primary);
   background: var(--bg-primary);
+  font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Custom scrollbar - subtle */
@@ -51,20 +55,20 @@ body {
 /* Markdown content styles - Wabi-sabi aesthetic */
 .markdown-content h1 {
   @apply text-2xl sm:text-3xl font-semibold mt-2 mb-6 pb-4 text-center tracking-wide;
-  font-family: var(--font-serif);
+  font-family: var(--font-serif), "Songti SC", "STSong", "SimSun", "Hiragino Mincho ProN", "Noto Serif CJK SC", serif;
   border-bottom: 1px solid var(--border);
   color: var(--text-primary);
 }
 
 .markdown-content h2 {
   @apply text-xl sm:text-2xl font-semibold mt-10 mb-4;
-  font-family: var(--font-serif);
+  font-family: var(--font-serif), "Songti SC", "STSong", "SimSun", "Hiragino Mincho ProN", "Noto Serif CJK SC", serif;
   color: var(--accent);
 }
 
 .markdown-content h3 {
   @apply text-base sm:text-lg font-semibold mt-8 mb-4 px-3 py-2 rounded;
-  font-family: var(--font-serif);
+  font-family: var(--font-serif), "Songti SC", "STSong", "SimSun", "Hiragino Mincho ProN", "Noto Serif CJK SC", serif;
   background: rgba(235, 229, 217, 0.7);
   border-left: 3px solid var(--accent);
   color: var(--text-primary);
@@ -72,7 +76,7 @@ body {
 
 .markdown-content h4 {
   @apply text-base font-medium mt-6 mb-2;
-  font-family: var(--font-serif);
+  font-family: var(--font-serif), "Songti SC", "STSong", "SimSun", "Hiragino Mincho ProN", "Noto Serif CJK SC", serif;
   color: var(--text-secondary);
 }
 
@@ -96,7 +100,7 @@ body {
 .markdown-content[lang="en"] h2,
 .markdown-content[lang="en"] h3,
 .markdown-content[lang="en"] h4 {
-  font-family: var(--font-serif-en);
+  font-family: var(--font-serif-en), Georgia, "Times New Roman", "Noto Serif", serif;
   letter-spacing: -0.01em;
   text-wrap: balance;
 }

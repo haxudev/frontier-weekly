@@ -52,6 +52,30 @@ function deriveTitle({ data, content, slug }) {
   return slug
 }
 
+function parseDateFromSlug(slug) {
+  const s = String(slug || '')
+  const m = s.match(/^(\d{4})(\d{2})(\d{2})$/)
+  if (!m) return null
+  const year = Number(m[1])
+  const monthIndex = Number(m[2]) - 1
+  const day = Number(m[3])
+  const d = new Date(year, monthIndex, day)
+  if (Number.isNaN(d.getTime())) return null
+  return d
+}
+
+function deriveDateIso({ data, slug }) {
+  if (data?.date) {
+    const d = new Date(data.date)
+    if (!Number.isNaN(d.getTime())) return d.toISOString()
+  }
+
+  const fromSlug = parseDateFromSlug(slug)
+  if (fromSlug) return fromSlug.toISOString()
+
+  return new Date().toISOString()
+}
+
 export function getAllWeeks(locale = 'zh') {
   const weeksDirectory = getWeeksDirectory(locale)
   // Ensure directory exists
@@ -89,7 +113,7 @@ export function getAllWeeks(locale = 'zh') {
       return {
         slug,
         title,
-        date: data.date || new Date().toISOString(),
+        date: deriveDateIso({ data, slug }),
         weekNumber: data.weekNumber || parseInt(slug.replace(/\D/g, '')) || 1,
         tags: data.tags || [],
         keywords,
@@ -127,7 +151,7 @@ export function getWeekBySlug(slug, locale = 'zh') {
   return {
     slug,
     title,
-    date: data.date || new Date().toISOString(),
+    date: deriveDateIso({ data, slug }),
     weekNumber: data.weekNumber || parseInt(slug.replace(/\D/g, '')) || 1,
     tags: data.tags || [],
     keywords,

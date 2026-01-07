@@ -5,18 +5,24 @@ import { LanguageProvider } from '@/contexts/LanguageContext'
 const notoSerifSC = Noto_Serif_SC({ 
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-serif'
+  variable: '--font-serif',
+  display: 'swap',
+  fallback: ['Songti SC', 'STSong', 'SimSun', 'Hiragino Mincho ProN', 'serif'],
 })
 
 const inter = Inter({ 
   subsets: ['latin'],
-  variable: '--font-sans'
+  variable: '--font-sans',
+  display: 'swap',
+  fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
 })
 
 const sourceSerif4 = Source_Serif_4({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-serif-en',
+  display: 'swap',
+  fallback: ['Georgia', 'Times New Roman', 'serif'],
 })
 
 export const metadata = {
