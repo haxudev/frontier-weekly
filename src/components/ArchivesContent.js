@@ -22,12 +22,16 @@ export default function ArchivesContent({ allWeeks }) {
       en: '← Back Home'
     },
     briefs: {
-      zh: '篇周报',
+      zh: '篇日报',
       en: 'briefs'
     },
     week: {
       zh: '周',
       en: 'Week'
+    },
+    briefLabel: {
+      zh: '日报',
+      en: 'Brief'
     },
     noContent: {
       zh: '暂无历史内容',
@@ -135,13 +139,15 @@ export default function ArchivesContent({ allWeeks }) {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-3 mb-2">
                               <span className="tag tag-accent text-xs">
-                                {language === 'en' ? `${t.week.en} ${week.weekNumber}` : `第${week.weekNumber}${t.week.zh}`}
+                                {!week.weekNumber
+                                  ? formatDate(week.date)
+                                  : (language === 'en' ? `${t.week.en} ${week.weekNumber}` : `第${week.weekNumber}${t.week.zh}`)}
                               </span>
                               <span 
                                 className="text-xs"
                                 style={{ color: 'var(--text-muted)' }}
                               >
-                                {formatDate(week.date)}
+                                {week.weekNumber ? formatDate(week.date) : ''}
                               </span>
                             </div>
                             <h3 
@@ -183,7 +189,7 @@ export default function ArchivesContent({ allWeeks }) {
         <div className="space-y-1">
           {language === 'zh' ? (
             <>
-              <p>本内容由领域记忆驱动的研究型内容生产工作流生成</p>
+              <p>本网站的发布和内容的撰写是由垂类记忆驱动的深度研究型多智能体协同工作流全自动完成</p>
               <p>联系作者：xuhaoruins@hotmail.com</p>
             </>
           ) : (
@@ -192,7 +198,7 @@ export default function ArchivesContent({ allWeeks }) {
               <p>Contact Author: xuhaoruins@hotmail.com</p>
             </>
           )}
-          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Weekly' : '礼拜观'}</p>
+          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Weekly' : '科技礼拜观'}</p>
         </div>
       </footer>
     </div>

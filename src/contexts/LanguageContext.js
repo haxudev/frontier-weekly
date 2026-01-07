@@ -5,14 +5,15 @@ import { usePathname } from 'next/navigation'
 
 const translations = {
   zh: {
-    siteTitle: '礼拜观',
-    siteSubtitle: '前沿趋势发现与科技热点洞察',
+    siteTitle: '科技礼拜观',
+    siteSubtitle: '低噪声前沿趋势发现与一手科技热点洞察',
     home: '首页',
     archives: '历史回顾',
     about: '关于',
-    latestBrief: '最新周报',
+    latestBrief: '最新日报',
     pastWeeks: '往期回顾',
     viewAll: '查看全部',
+    briefLabel: '日报',
     readMore: '阅读全文',
     publishedOn: '发布于',
     tableOfContents: '目录',
@@ -34,6 +35,7 @@ const translations = {
     latestBrief: 'Latest Brief',
     pastWeeks: 'Past Weeks',
     viewAll: 'View All',
+    briefLabel: 'Brief',
     readMore: 'Read More',
     publishedOn: 'Published on',
     tableOfContents: 'Table of Contents',

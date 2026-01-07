@@ -155,6 +155,23 @@ function deriveDateIso({ data, slug }) {
   return new Date().toISOString()
 }
 
+function deriveWeekNumber({ data, slug }) {
+  const fmWeekNumber = data?.weekNumber
+  if (typeof fmWeekNumber === 'number' && Number.isFinite(fmWeekNumber)) return fmWeekNumber
+  if (typeof fmWeekNumber === 'string' && fmWeekNumber.trim()) {
+    const parsed = Number(fmWeekNumber)
+    if (Number.isFinite(parsed)) return parsed
+  }
+
+  // If slug is a date like 20260106, this is a “daily” issue; do not derive a week number.
+  if (parseDateFromSlug(slug)) return null
+
+  const digits = String(slug || '').replace(/\D/g, '')
+  if (!digits) return 1
+  const n = parseInt(digits, 10)
+  return Number.isFinite(n) ? n : 1
+}
+
 export function getAllWeeks(locale = 'zh') {
   const weeksDirectory = getWeeksDirectory(locale)
   // Ensure directory exists
@@ -193,7 +210,7 @@ export function getAllWeeks(locale = 'zh') {
         slug,
         title,
         date: deriveDateIso({ data, slug }),
-        weekNumber: data.weekNumber || parseInt(slug.replace(/\D/g, '')) || 1,
+        weekNumber: deriveWeekNumber({ data, slug }),
         tags: data.tags || [],
         keywords,
         excerpt,
@@ -231,7 +248,7 @@ export function getWeekBySlug(slug, locale = 'zh') {
     slug,
     title,
     date: deriveDateIso({ data, slug }),
-    weekNumber: data.weekNumber || parseInt(slug.replace(/\D/g, '')) || 1,
+    weekNumber: deriveWeekNumber({ data, slug }),
     tags: data.tags || [],
     keywords,
     content,

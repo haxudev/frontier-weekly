@@ -281,11 +281,11 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
 
   const t = {
     title: {
-      zh: '礼拜观',
+      zh: '科技礼拜观',
       en: 'Frontier Weekly'
     },
     subtitle: {
-      zh: '前沿趋势发现与科技热点洞察',
+      zh: '低噪声前沿趋势发现与一手科技热点洞察',
       en: 'Trends Discovery & Idea Insights'
     }
   }
@@ -365,7 +365,7 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
         <div className="space-y-1">
           {language === 'zh' ? (
             <>
-              <p>本内容是由垂类记忆驱动的深度研究型多智能体工作流全自动撰写和发布</p>
+              <p>本网站的发布和内容的撰写是由垂类记忆驱动的深度研究型多智能体协同工作流全自动完成</p>
               <p>联系作者：xuhaoruins@hotmail.com</p>
             </>
           ) : (
@@ -374,7 +374,7 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
               <p>Contact Author: xuhaoruins@hotmail.com</p>
             </>
           )}
-          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Weekly' : '礼拜观'}</p>
+          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Weekly' : '科技礼拜观'}</p>
         </div>
       </footer>
     </div>

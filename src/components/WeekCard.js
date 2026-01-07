@@ -25,7 +25,7 @@ export default function WeekCard({ week }) {
         <div className="p-6">
           <div className="flex items-center justify-between mb-3">
             <span className="tag tag-primary">
-              {t('week')}{week.weekNumber}{t('weekSuffix')}
+              {week.weekNumber ? `${t('week')}${week.weekNumber}${t('weekSuffix')}` : t('briefLabel')}
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400">
               {formatDate(week.date)}

@@ -15,15 +15,15 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
 
   const t = {
     title: {
-      zh: '礼拜观',
+      zh: '科技礼拜观',
       en: 'Frontier Weekly'
     },
     subtitle: {
-      zh: '前沿趋势发现与科技热点洞察',
+      zh: '低噪声前沿趋势发现与一手科技热点洞察',
       en: 'Trends Discovery & Idea Insights'
     },
     archives: {
-      zh: '查看全部周报',
+      zh: '查看全部日报',
       en: 'View All Briefs'
     },
     noContent: {
@@ -107,7 +107,7 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
           )}
 
           {/* Archives Link */}
-          {recentWeeks.length > 1 && (
+          {recentWeeks.length > 0 && (
             <div className="text-center mt-12 animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <Link 
                 href={`${prefix}/archives`}
@@ -133,7 +133,7 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
         <div className="space-y-1">
           {language === 'zh' ? (
             <>
-              <p>本内容由领域记忆驱动的研究型内容生产工作流生成</p>
+              <p>本网站的发布和内容的撰写是由垂类记忆驱动的深度研究型多智能体协同工作流全自动完成</p>
               <p>联系作者：xuhaoruins@hotmail.com</p>
             </>
           ) : (
@@ -142,7 +142,7 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
               <p>Contact Author: xuhaoruins@hotmail.com</p>
             </>
           )}
-          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Weekly' : '礼拜观'}</p>
+          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Weekly' : '科技礼拜观'}</p>
         </div>
       </footer>
     </div>

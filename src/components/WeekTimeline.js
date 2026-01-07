@@ -35,7 +35,7 @@ export default function WeekTimeline({ weeks, currentSlug }) {
           >
             <div className="flex items-center justify-between">
               <span className="font-medium">
-                {t('week')}{week.weekNumber}{t('weekSuffix')}
+                {week.weekNumber ? `${t('week')}${week.weekNumber}${t('weekSuffix')}` : t('briefLabel')}
               </span>
               <span className="text-xs opacity-75">
                 {formatDate(week.date)}
