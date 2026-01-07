@@ -14,6 +14,32 @@ function escapeHtmlAttribute(value) {
     .replace(/>/g, '&gt;')
 }
 
+// 预处理 Markdown：修复粗体/斜体在中文标点前后无法正确解析的问题
+function fixCjkEmphasis(content) {
+  if (typeof content !== 'string') return content
+
+  // 中日韩标点符号集合（用 Unicode 转义避免解析问题）
+  // 。，、；：？！""''【】（）《》〈〉「」『』…—～·
+  const cjkPunct = '\u3002\uff0c\u3001\uff1b\uff1a\uff1f\uff01\u201c\u201d\u2018\u2019\u3010\u3011\uff08\uff09\u300a\u300b\u3008\u3009\u300c\u300d\u300e\u300f\u2026\u2014\uff5e\u00b7'
+  // 常规西文标点
+  const latinPunct = '.,;:?!\'"()\\[\\]{}\\-'
+
+  // 修复：**文字**后紧跟标点时，在 ** 和标点之间加零宽空格
+  // 例如：**跨模型可复现性仍未被证明。** → 能正常渲染
+  
+  let result = content
+
+  // 处理粗体：**text** 其中 text 可能以标点结尾
+  // 关键：remark-gfm 在某些情况下无法识别 **text。** 这种模式
+  // 解决方案：在闭合 ** 前的标点后添加零宽空格
+  
+  // 方案1：修复 **内容以标点结尾** 的情况（在结尾标点后、** 前加零宽空格）
+  const punctPattern = new RegExp(`([${cjkPunct}${latinPunct}])\\*\\*(?=[^*]|$)`, 'g')
+  result = result.replace(punctPattern, '$1\u200B**')
+
+  return result
+}
+
 function compactCitationLinks(contentHtml) {
   if (typeof contentHtml !== 'string' || !contentHtml) return contentHtml
 
@@ -166,11 +192,14 @@ export async function getWeekContent(slug, locale = 'zh') {
     return null
   }
 
+  // 预处理：修复中文标点与粗体/斜体的兼容问题
+  const fixedContent = fixCjkEmphasis(week.content)
+
   // Process markdown to HTML
   const processedContent = await remark()
     .use(gfm)
     .use(html, { sanitize: false })
-    .process(week.content)
+    .process(fixedContent)
 
   let contentHtml = processedContent.toString()
 

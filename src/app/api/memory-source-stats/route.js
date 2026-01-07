@@ -66,6 +66,34 @@ function normalizeRows(rows) {
   return { items, total, fieldInfo: { sourceField, countField } }
 }
 
+// 清理 source 名称：去掉 "rss:" 前缀，合并 "arxiv-*" 为 "arXiv"
+function cleanAndMergeItems(items) {
+  const merged = new Map()
+
+  for (const item of items) {
+    let source = item.source
+
+    // 去掉 "rss:" 前缀
+    if (source.startsWith('rss:')) {
+      source = source.slice(4)
+    }
+
+    // 合并 arxiv-* 为 arXiv
+    if (source.toLowerCase().startsWith('arxiv-') || source.toLowerCase() === 'arxiv') {
+      source = 'arXiv'
+    }
+
+    const existing = merged.get(source)
+    if (existing) {
+      existing.count += item.count
+    } else {
+      merged.set(source, { source, count: item.count })
+    }
+  }
+
+  return Array.from(merged.values())
+}
+
 function toPercent(count, total) {
   if (!total) return 0
   return (count / total) * 100
@@ -152,23 +180,27 @@ export async function GET(req) {
     )
   }
 
-  const sorted = [...normalized.items].sort((a, b) => b.count - a.count)
+  // 清理并合并 source（去 rss: 前缀，合并 arxiv-*）
+  const cleanedItems = cleanAndMergeItems(normalized.items)
+  const cleanedTotal = cleanedItems.reduce((sum, item) => sum + item.count, 0)
+
+  const sorted = [...cleanedItems].sort((a, b) => b.count - a.count)
   const topItems = sorted.slice(0, topN)
   const restItems = sorted.slice(topN)
 
   const topSum = topItems.reduce((sum, item) => sum + item.count, 0)
-  const otherCount = normalized.total - topSum
+  const otherCount = cleanedTotal - topSum
 
   return NextResponse.json(
     {
-      total: normalized.total,
+      total: cleanedTotal,
       top: topItems.map((item) => ({
         ...item,
-        percent: toPercent(item.count, normalized.total),
+        percent: toPercent(item.count, cleanedTotal),
       })),
       other: {
         count: otherCount,
-        percent: toPercent(otherCount, normalized.total),
+        percent: toPercent(otherCount, cleanedTotal),
         sources: restItems.length,
       },
     },
