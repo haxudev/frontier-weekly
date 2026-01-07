@@ -125,6 +125,35 @@ npm run build
 
 将 `out` 目录部署到任何静态托管服务（GitHub Pages, Netlify, Cloudflare Pages 等）。
 
+## 🧠 记忆统计（Supabase）
+
+本项目新增了一个记忆来源统计页面，用于展示 `memory_source_stats` 的 Top 10 来源占比，并将其余来源合并到“其他”。
+
+### 环境变量
+
+参考 [.env.example](.env.example) 添加到 `.env.local`：
+
+- `SUPABASE_URL`
+- `SUPABASE_PUBLIC_KEY`（Supabase anon/publishable key）
+
+### 展示与接口
+
+- 展示：全站右下角浮动按钮「记忆 / Memory」，点击弹出统计泡泡
+- API：`/api/memory-source-stats?top=10`
+
+如果你看到 404 且错误里带 `PGRST205`，通常表示 PostgREST 找不到 `public.memory_source_stats`（表/视图不存在，或不在暴露的 schema）。
+
+可通过环境变量自定义：
+
+- `MEMORY_SOURCE_STATS_TABLE`（默认 `memory_source_stats`）
+- `MEMORY_SOURCE_STATS_SCHEMA`（默认 `public`，会作为 `Accept-Profile` 发送给 PostgREST）
+
+### 本地命令行查询
+
+```bash
+npm run memory:stats
+```
+
 ## 📄 License
 
 MIT

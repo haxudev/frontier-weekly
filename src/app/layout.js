@@ -1,6 +1,8 @@
 import './globals.css'
 import { Noto_Serif_SC, Source_Serif_4, Inter } from 'next/font/google'
 import { LanguageProvider } from '@/contexts/LanguageContext'
+import MemoryBubble from '@/components/MemoryBubble'
+import BackToTop from '@/components/BackToTop'
 
 const notoSerifSC = Noto_Serif_SC({ 
   subsets: ['latin'],
@@ -40,6 +42,8 @@ export default function RootLayout({ children }) {
               {children}
             </main>
           </div>
+          <BackToTop />
+          <MemoryBubble />
         </LanguageProvider>
       </body>
     </html>
