@@ -4,7 +4,7 @@ import path from 'path'
 const listFile = process.argv[2] || 'added_zh_files.txt'
 const token = process.env.GITHUB_MODELS_TOKEN
 const endpoint = process.env.GITHUB_MODELS_ENDPOINT || 'https://models.inference.ai.azure.com'
-const model = process.env.MODEL_ID || 'gpt-4o-mini'
+const model = process.env.MODEL_ID || 'gpt-5'
 
 if (!token) {
   console.error('Missing GITHUB_MODELS_TOKEN secret. Set repo secret GH_MODELS_TOKEN.')
