@@ -8,9 +8,13 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: translate-zh-to-en-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   translate:
-    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[skip translate]')
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message || '', '[skip translate]')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,33 +22,52 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Detect newly added zh Markdown files
+      - name: Detect zh Markdown files to translate
         id: detect
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
           BASE="${{ github.event.before }}"
           HEAD="${{ github.sha }}"
-          echo "Diff base=$BASE head=$HEAD"
-          # List added zh markdown files in this push
-          git diff --name-status "$BASE" "$HEAD" | awk '$1=="A" && $2 ~ /^content\\/zh\\/.*\\.md$/ {print $2}' > added_zh_files.txt || true
-          echo "Added zh files:" || true
-          cat added_zh_files.txt || true
-          COUNT=$(wc -l < added_zh_files.txt || echo 0)
-          echo "ADDED_ZH_COUNT=$COUNT" >> "$GITHUB_OUTPUT"
 
-      - name: Copy new files to content/en
-        if: steps.detect.outputs.ADDED_ZH_COUNT != '0'
-        shell: bash
-        run: |
-          set -e
+          echo "Diff base=$BASE head=$HEAD"
+
+          # Fallback for first push / missing base commit
+          if [[ "$BASE" == "0000000000000000000000000000000000000000" ]] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            if git rev-parse "$HEAD^" >/dev/null 2>&1; then
+              BASE="$(git rev-parse "$HEAD^")"
+              echo "Base not available; fallback base=$BASE"
+            else
+              BASE=""
+              echo "Base not available; will rely on missing-en detection only"
+            fi
+          fi
+
+          tmpfile="$(mktemp)"
+          : > "$tmpfile"
+
+          # 1) Files changed (added/modified) in this push
+          if [[ -n "$BASE" ]]; then
+            git diff --name-only --diff-filter=AM "$BASE" "$HEAD" -- 'content/zh/*.md' >> "$tmpfile" || true
+          fi
+
+          # 2) Fallback: any zh file missing its en counterpart
           mkdir -p content/en
-          while read -r file; do
-            [ -z "$file" ] && continue
-            base=$(basename "$file")
-            cp "$file" "content/en/$base"
-            echo "Copied $file -> content/en/$base"
-          done < added_zh_files.txt
+          for f in content/zh/*.md; do
+            [[ -e "$f" ]] || continue
+            b="$(basename "$f")"
+            if [[ ! -f "content/en/$b" ]]; then
+              echo "$f" >> "$tmpfile"
+            fi
+          done
+
+          sort -u "$tmpfile" | sed '/^$/d' > added_zh_files.txt
+          rm -f "$tmpfile"
+
+          echo "Zh files to translate:" || true
+          cat added_zh_files.txt || true
+          COUNT=$(wc -l < added_zh_files.txt | tr -d ' ')
+          echo "ADDED_ZH_COUNT=$COUNT" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node.js
         if: steps.detect.outputs.ADDED_ZH_COUNT != '0'
@@ -52,7 +75,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Translate copied files with GitHub Models (Copilot)
+      - name: Translate zh files to content/en with GitHub Models (Copilot)
         if: steps.detect.outputs.ADDED_ZH_COUNT != '0'
         env:
           GITHUB_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
@@ -65,13 +88,14 @@ jobs:
         if: steps.detect.outputs.ADDED_ZH_COUNT != '0'
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add content/en/*.md || true
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Auto-copy & translate new zh content to en [skip translate]"
+            git commit -m "Auto-translate zh content to en [skip translate]"
+            git pull --rebase
             git push
           fi

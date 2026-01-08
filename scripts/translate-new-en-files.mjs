@@ -2,12 +2,12 @@ import fs from 'fs/promises'
 import path from 'path'
 
 const listFile = process.argv[2] || 'added_zh_files.txt'
-const token = process.env.GITHUB_MODELS_TOKEN
-const endpoint = process.env.GITHUB_MODELS_ENDPOINT || 'https://models.inference.ai.azure.com'
+const token = process.env.GITHUB_MODELS_TOKEN || process.env.GITHUB_TOKEN
+const endpoint = process.env.GITHUB_MODELS_ENDPOINT || process.env.GITHUB_MODEL_ENDPOINT || 'https://models.inference.ai.azure.com'
 const model = process.env.MODEL_ID || 'gpt-5'
 
 if (!token) {
-  console.error('Missing GITHUB_MODELS_TOKEN secret. Set repo secret GH_MODELS_TOKEN.')
+  console.error('Missing token. Set env GITHUB_MODELS_TOKEN (CI) or GITHUB_TOKEN (local).')
   process.exit(1)
 }
 
@@ -23,7 +23,6 @@ async function readList(filePath) {
 async function translateMarkdown(markdown) {
   const body = {
     model,
-    temperature: 0,
     messages: [
       {
         role: 'system',
@@ -58,21 +57,27 @@ async function translateMarkdown(markdown) {
 }
 
 async function main() {
+  console.log(`Using endpoint=${endpoint}`)
+  console.log(`Using model=${model}`)
+  console.log(`Using listFile=${listFile}`)
+
   const zhFiles = await readList(listFile)
   if (zhFiles.length === 0) {
     console.log('No zh files to translate')
     return
   }
+  await fs.mkdir(path.join('content', 'en'), { recursive: true })
   for (const zhPath of zhFiles) {
     const base = path.basename(zhPath)
     const enPath = path.join('content', 'en', base)
     try {
-      const src = await fs.readFile(enPath, 'utf-8')
+      await fs.access(zhPath)
+      const src = await fs.readFile(zhPath, 'utf-8')
       const out = await translateMarkdown(src)
       await fs.writeFile(enPath, out, 'utf-8')
-      console.log(`Translated: ${enPath}`)
+      console.log(`Translated: ${zhPath} -> ${enPath}`)
     } catch (e) {
-      console.error(`Failed to translate ${enPath}:`, e.message)
+      console.error(`Failed to translate ${zhPath}:`, e.message)
       process.exitCode = 1
     }
   }
