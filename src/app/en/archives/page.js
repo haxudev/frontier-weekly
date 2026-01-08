@@ -2,8 +2,8 @@ import { getAllWeeks } from '@/lib/weeks'
 import ArchivesContent from '@/components/ArchivesContent'
 
 export const metadata = {
-  title: 'Archives | Frontier Weekly',
-  description: 'Trends Discovery & Idea Insights',
+  title: 'Archives | Frontier Daily',
+  description: 'Firsthand cutting-edge trends and low slop tech insights .',
 }
 
 export default function EnArchivesPage() {

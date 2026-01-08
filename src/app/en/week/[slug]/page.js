@@ -18,7 +18,7 @@ export async function generateMetadata({ params }) {
   }
 
   return {
-    title: `${week.title} | Frontier Weekly`,
+    title: `${week.title} | Frontier Daily`,
     description: week.excerpt || week.title,
   }
 }

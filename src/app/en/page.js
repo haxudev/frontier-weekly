@@ -2,8 +2,8 @@ import { getRecentWeeks, getWeekContent } from '@/lib/weeks'
 import HomeContent from '@/components/HomeContent'
 
 export const metadata = {
-  title: 'Frontier Weekly',
-  description: 'Trends Discovery & Idea Insights',
+  title: 'Frontier Daily',
+  description: 'Firsthand cutting-edge trends and low slop tech insights .',
 }
 
 export default async function EnHomePage() {

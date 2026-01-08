@@ -20,7 +20,7 @@ export async function generateMetadata({ params }) {
   }
 
   return {
-    title: `${week.title} | 科技今辰观`,
+    title: `${week.title} | 前沿今辰观`,
     description: week.excerpt || week.title,
   }
 }
@@ -35,10 +35,10 @@ export default async function WeekPage({ params }) {
   }
 
   return (
-    <WeekDetailClient 
-      week={week} 
-      recentWeeks={recentWeeks} 
-      currentSlug={resolvedParams.slug} 
+    <WeekDetailClient
+      week={week}
+      recentWeeks={recentWeeks}
+      currentSlug={resolvedParams.slug}
     />
   )
 }

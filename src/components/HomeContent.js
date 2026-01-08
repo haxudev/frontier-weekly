@@ -19,12 +19,12 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
 
   const t = {
     title: {
-      zh: '科技今辰观',
-      en: 'Frontier Weekly'
+      zh: '前沿今辰观',
+      en: 'Frontier Daily'
     },
     subtitle: {
       zh: '低噪声前沿趋势发现与一手科技热点洞察',
-      en: 'Trends Discovery & Idea Insights'
+      en: 'Firsthand cutting-edge trends and low slop tech insights .'
     },
     archives: {
       zh: '查看全部日报',
@@ -147,7 +147,7 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
               <p>Contact Author: xuhaoruins@hotmail.com</p>
             </>
           )}
-          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Weekly' : '科技今辰观'}</p>
+          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Daily' : '前沿今辰观'}</p>
         </div>
       </footer>
     </div>

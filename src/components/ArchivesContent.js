@@ -198,7 +198,7 @@ export default function ArchivesContent({ allWeeks }) {
               <p>Contact Author: xuhaoruins@hotmail.com</p>
             </>
           )}
-          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Weekly' : '科技今辰观'}</p>
+          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Daily' : '前沿今辰观'}</p>
         </div>
       </footer>
     </div>

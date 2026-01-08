@@ -28,7 +28,7 @@ const sourceSerif4 = Source_Serif_4({
 })
 
 export const metadata = {
-  title: '科技今辰观',
+  title: '前沿今辰观',
   description: '低噪声前沿趋势发现与一手科技热点洞察',
 }
 
