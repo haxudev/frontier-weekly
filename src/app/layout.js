@@ -29,7 +29,7 @@ const sourceSerif4 = Source_Serif_4({
 
 export const metadata = {
   title: '前沿今辰观',
-  description: '低噪声前沿趋势发现与一手科技热点洞察',
+  description: '无噪声前沿趋势发现与高质量科技热点洞察',
 }
 
 export default function RootLayout({ children }) {

@@ -3,7 +3,7 @@ import ArchivesContent from '@/components/ArchivesContent'
 
 export const metadata = {
   title: 'Archives | Frontier Daily',
-  description: 'Firsthand cutting-edge trends and low slop tech insights .',
+  description: 'No slop cutting-edge trends and high quality tech insights',
 }
 
 export default function EnArchivesPage() {

@@ -3,7 +3,7 @@ import HomeContent from '@/components/HomeContent'
 
 export const metadata = {
   title: 'Frontier Daily',
-  description: 'Firsthand cutting-edge trends and low slop tech insights .',
+  description: 'No slop cutting-edge trends and high quality tech insights',
 }
 
 export default async function EnHomePage() {
