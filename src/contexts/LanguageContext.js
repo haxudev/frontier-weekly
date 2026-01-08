@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 
 const translations = {
   zh: {
-    siteTitle: '科技礼拜观',
+    siteTitle: '科技今辰观',
     siteSubtitle: '低噪声前沿趋势发现与一手科技热点洞察',
     home: '首页',
     archives: '历史回顾',

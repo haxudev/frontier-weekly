@@ -20,7 +20,7 @@ export async function generateMetadata({ params }) {
   }
 
   return {
-    title: `${week.title} | 科技礼拜观`,
+    title: `${week.title} | 科技今辰观`,
     description: week.excerpt || week.title,
   }
 }

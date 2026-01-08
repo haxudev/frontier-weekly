@@ -2,9 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useRef } from 'react'
 import WeekDots from '@/components/WeekDots'
 import LanguageToggle from '@/components/LanguageToggle'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { useCitationInteractions } from '@/lib/useCitationInteractions'
 
 export default function HomeContent({ latestWeek, recentWeeks }) {
   const { language } = useLanguage()
@@ -12,10 +14,12 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
   const isEn = pathname === '/en' || pathname.startsWith('/en/')
   const prefix = isEn ? '/en' : ''
   const contentMaxWidth = language === 'en' ? 'max-w-4xl' : 'max-w-3xl'
+  const contentRef = useRef(null)
+  useCitationInteractions(contentRef, [latestWeek?.contentHtml])
 
   const t = {
     title: {
-      zh: '科技礼拜观',
+      zh: '科技今辰观',
       en: 'Frontier Weekly'
     },
     subtitle: {
@@ -93,6 +97,7 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
                 <div 
                   className="markdown-content"
                   lang={language}
+                  ref={contentRef}
                   dangerouslySetInnerHTML={{ __html: latestWeek.contentHtml }}
                 />
               )}
@@ -142,7 +147,7 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
               <p>Contact Author: xuhaoruins@hotmail.com</p>
             </>
           )}
-          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Weekly' : '科技礼拜观'}</p>
+          <p className="pt-1">© {new Date().getFullYear()} {language === 'en' ? 'Frontier Weekly' : '科技今辰观'}</p>
         </div>
       </footer>
     </div>
