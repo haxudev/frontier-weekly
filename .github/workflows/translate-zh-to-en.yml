@@ -39,27 +39,19 @@ jobs:
               echo "Base not available; fallback base=$BASE"
             else
               BASE=""
-              echo "Base not available; will rely on missing-en detection only"
+              echo "Base not available; will translate all tracked zh files"
             fi
           fi
 
           tmpfile="$(mktemp)"
           : > "$tmpfile"
 
-          # 1) Files changed (added/modified) in this push
+          # Files changed (added/modified) in this push
           if [[ -n "$BASE" ]]; then
             git diff --name-only --diff-filter=AM "$BASE" "$HEAD" -- 'content/zh/*.md' >> "$tmpfile" || true
+          else
+            git ls-files -- 'content/zh/*.md' >> "$tmpfile" || true
           fi
-
-          # 2) Fallback: any zh file missing its en counterpart
-          mkdir -p content/en
-          for f in content/zh/*.md; do
-            [[ -e "$f" ]] || continue
-            b="$(basename "$f")"
-            if [[ ! -f "content/en/$b" ]]; then
-              echo "$f" >> "$tmpfile"
-            fi
-          done
 
           sort -u "$tmpfile" | sed '/^$/d' > added_zh_files.txt
           rm -f "$tmpfile"
@@ -68,6 +60,11 @@ jobs:
           cat added_zh_files.txt || true
           COUNT=$(wc -l < added_zh_files.txt | tr -d ' ')
           echo "ADDED_ZH_COUNT=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: No zh changes; skip translation
+        if: steps.detect.outputs.ADDED_ZH_COUNT == '0'
+        run: |
+          echo "No new/modified content/zh/*.md in this push; skipping translation."
 
       - name: Setup Node.js
         if: steps.detect.outputs.ADDED_ZH_COUNT != '0'
