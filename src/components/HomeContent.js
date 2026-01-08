@@ -23,8 +23,8 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
       en: 'Frontier Daily'
     },
     subtitle: {
-      zh: '无噪声前沿趋势发现与高质量科技热点洞察',
-      en: 'No slop cutting-edge trends and high quality tech insights'
+      zh: '无噪声前沿趋势发现与科技干货洞察',
+      en: 'No slop frontier trends and firsthand tech insights'
     },
     archives: {
       zh: '查看全部日报',

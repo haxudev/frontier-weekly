@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 const translations = {
   zh: {
     siteTitle: '前沿今辰观',
-    siteSubtitle: '无噪声前沿趋势发现与高质量科技热点洞察',
+    siteSubtitle: '无噪声前沿趋势发现与科技干货洞察',
     home: '首页',
     archives: '历史回顾',
     about: '关于',
@@ -28,7 +28,7 @@ const translations = {
   },
   en: {
     siteTitle: 'Frontier Daily',
-    siteSubtitle: 'No slop cutting-edge trends and high quality tech insights',
+    siteSubtitle: 'No slop frontier trends and firsthand tech insights',
     home: 'Home',
     archives: 'Archives',
     about: 'About',
