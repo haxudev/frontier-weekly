@@ -26,7 +26,7 @@ export async function generateMetadata({ params }) {
 export default async function EnWeekPage({ params }) {
   const resolvedParams = await params
   const week = await getWeekContent(resolvedParams.slug, 'en')
-  const recentWeeks = getRecentWeeks(8, 'en')
+  const recentWeeks = getRecentWeeks(10, 'en')
 
   if (!week) {
     notFound()

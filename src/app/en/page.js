@@ -7,7 +7,7 @@ export const metadata = {
 }
 
 export default async function EnHomePage() {
-  const recentWeeks = getRecentWeeks(8, 'en')
+  const recentWeeks = getRecentWeeks(10, 'en')
   const latestWeekMeta = recentWeeks[0] || null
 
   const latestWeek = latestWeekMeta ? await getWeekContent(latestWeekMeta.slug, 'en') : null

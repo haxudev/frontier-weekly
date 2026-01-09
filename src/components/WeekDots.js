@@ -69,8 +69,8 @@ export default function WeekDots({ weeks, currentSlug }) {
     return slug
   }
 
-  // Take the most recent weeks (up to 7)
-  const displayWeeks = weeks.slice(0, 7)
+  // Take the most recent weeks (up to 10)
+  const displayWeeks = weeks.slice(0, 10)
 
   return (
     <div className="flex flex-wrap gap-2 py-2">
