@@ -72,8 +72,24 @@ export default function WeekDots({ weeks, currentSlug }) {
   // Take the most recent weeks (up to 10)
   const displayWeeks = weeks.slice(0, 10)
 
+  const formatWeekLabelShort = (week) => {
+    const slug = String(week.slug || '')
+    const match = slug.match(/^(\d{4})(\d{2})(\d{2})$/)
+    if (!match) return formatWeekLabel(week)
+
+    const monthIndex = Number(match[2]) - 1
+    const day = Number(match[3])
+
+    if (isEn) {
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      return `${monthNames[monthIndex]} ${day}`
+    }
+
+    return `${monthIndex + 1}月${day}日`
+  }
+
   return (
-    <div className="flex flex-wrap gap-2 py-2">
+    <div className="grid grid-cols-5 gap-2 py-2 md:flex md:flex-nowrap md:items-center md:gap-2 md:overflow-x-auto no-scrollbar">
       {displayWeeks.map((week, index) => {
         const isActive = currentSlug === week.slug
         
@@ -81,7 +97,7 @@ export default function WeekDots({ weeks, currentSlug }) {
           <Link 
             key={week.slug}
             href={`${prefix}/week/${week.slug}`}
-            className="week-pill"
+            className="week-pill w-full md:w-auto"
             title={formatWeekTitle(week)}
             style={{
               animationDelay: `${index * 0.05}s`,
@@ -90,7 +106,8 @@ export default function WeekDots({ weeks, currentSlug }) {
               border: `1px solid ${isActive ? 'var(--text-primary)' : 'var(--border)'}`,
             }}
           >
-            {formatWeekLabel(week)}
+            <span className="md:hidden">{formatWeekLabelShort(week)}</span>
+            <span className="hidden md:inline">{formatWeekLabel(week)}</span>
           </Link>
         )
       })}

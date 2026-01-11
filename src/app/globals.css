@@ -47,6 +47,16 @@ body {
   background: #b8b0a0;
 }
 
+/* Hide scrollbar (for horizontal pill nav, etc.) */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Selection */
 ::selection {
   background: rgba(184, 134, 11, 0.2);
@@ -397,7 +407,7 @@ body {
 
 /* Week pill navigation */
 .week-pill {
-  @apply px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap;
+  @apply inline-flex items-center justify-center px-2.5 py-1.5 rounded-full text-xs md:px-3 md:py-1.5 md:text-sm font-medium transition-all duration-200 whitespace-nowrap;
   cursor: pointer;
 }
 
