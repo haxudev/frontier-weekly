@@ -1,12 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useTheme } from './ThemeProvider'
 import { useLanguage } from '@/contexts/LanguageContext'
+import LanguageToggle from '@/components/LanguageToggle'
 
 export default function Header() {
   const { theme, toggleTheme } = useTheme()
-  const { lang, setLang, t } = useLanguage()
+  const { t } = useLanguage()
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
@@ -14,16 +16,21 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">W</span>
-            </div>
+            <Image
+              src="/icon.jpg"
+              alt={t('siteTitle')}
+              width={32}
+              height={32}
+              priority
+              className="rounded-lg ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm bg-white dark:bg-gray-900 object-cover"
+            />
             <span className="font-bold text-lg text-gray-900 dark:text-white hidden sm:block">
               {t('siteTitle')}
             </span>
           </Link>
 
           {/* Navigation */}
-          <nav className="flex items-center space-x-1 sm:space-x-4">
+          <nav className="flex items-center gap-2 sm:gap-4">
             <Link 
               href="/" 
               className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
@@ -36,15 +43,7 @@ export default function Header() {
             >
               {t('archives')}
             </Link>
-            
-            {/* Language Toggle */}
-            <button
-              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-              className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-              title={t('language')}
-            >
-              {lang === 'zh' ? 'EN' : '中文'}
-            </button>
+            <LanguageToggle />
 
             {/* Theme Toggle */}
             <button

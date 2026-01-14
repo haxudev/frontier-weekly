@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useRef } from 'react'
 import WeekDots from '@/components/WeekDots'
-import LanguageToggle from '@/components/LanguageToggle'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useCitationInteractions } from '@/lib/useCitationInteractions'
 
@@ -57,9 +56,6 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
             {t.subtitle[language]}
           </p>
 
-          <div className="animate-fade-in" style={{ animationDelay: '0.15s' }}>
-            <LanguageToggle />
-          </div>
         </div>
       </section>
 

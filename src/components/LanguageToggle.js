@@ -7,58 +7,61 @@ function stripTrailingSlash(path) {
   return path
 }
 
-export default function LanguageToggle() {
+export default function LanguageToggle({ className = '' }) {
   const router = useRouter()
   const pathnameRaw = usePathname() || '/'
   const pathname = stripTrailingSlash(pathnameRaw)
 
   const isEn = pathname === '/en' || pathname.startsWith('/en/')
 
-  const targetPath = isEn
-    ? (pathname.replace(/^\/en/, '') || '/')
-    : (pathname === '/' ? '/en' : `/en${pathname}`)
+  const getTargetPath = (targetLang) => {
+    const base = isEn ? pathname.replace(/^\/en/, '') || '/' : pathname
+    if (targetLang === 'en') {
+      return base === '/' ? '/en' : `/en${base}`
+    }
+    return base === '' ? '/' : base
+  }
+
+  const go = (targetLang) => {
+    if ((targetLang === 'en' && isEn) || (targetLang === 'zh' && !isEn)) return
+    router.push(getTargetPath(targetLang))
+  }
 
   return (
-    <div className="flex justify-center">
-      <div
-        className="inline-flex items-center rounded-full p-1"
+    <div className={`relative inline-flex items-center gap-1 rounded-full border px-1.5 py-1 text-xs font-semibold shadow-sm transition-all duration-200 ${className}`} role="group" aria-label="Language switcher" style={{
+      background: 'var(--toggle-bg)',
+      borderColor: 'var(--border)',
+      boxShadow: 'var(--shadow-soft)',
+      backdropFilter: 'blur(10px)'
+    }}>
+      <span
+        aria-hidden="true"
+        className="absolute inset-y-1 w-1/2 rounded-full transition-transform duration-200"
         style={{
-          background: 'rgba(235, 229, 217, 0.55)',
-          border: '1px solid var(--border)',
-          backdropFilter: 'blur(8px)',
+          transform: isEn ? 'translateX(100%)' : 'translateX(0)',
+          background: 'var(--toggle-thumb)',
+          boxShadow: 'var(--shadow-soft)'
         }}
+      />
+
+      <button
+        type="button"
+        onClick={() => go('zh')}
+        aria-pressed={!isEn}
+        className="relative z-10 w-16 px-3 py-1 text-center transition-colors duration-150"
+        style={{ color: !isEn ? 'var(--text-primary)' : 'var(--text-muted)' }}
       >
-        <button
-          type="button"
-          onClick={() => {
-            if (!isEn) return
-            router.push(targetPath)
-          }}
-          className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
-          style={{
-            background: !isEn ? 'var(--bg-card)' : 'transparent',
-            color: !isEn ? 'var(--text-primary)' : 'var(--text-muted)',
-            boxShadow: !isEn ? '0 6px 18px rgba(45, 42, 38, 0.10)' : 'none',
-          }}
-        >
-          中文
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            if (isEn) return
-            router.push(targetPath)
-          }}
-          className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
-          style={{
-            background: isEn ? 'var(--bg-card)' : 'transparent',
-            color: isEn ? 'var(--text-primary)' : 'var(--text-muted)',
-            boxShadow: isEn ? '0 6px 18px rgba(45, 42, 38, 0.10)' : 'none',
-          }}
-        >
-          EN
-        </button>
-      </div>
+        中文
+      </button>
+      <button
+        type="button"
+        onClick={() => go('en')}
+        aria-pressed={isEn}
+        className="relative z-10 w-16 px-3 py-1 text-center transition-colors duration-150"
+        style={{ color: isEn ? 'var(--text-primary)' : 'var(--text-muted)' }}
+      >
+        EN
+      </button>
     </div>
   )
 }

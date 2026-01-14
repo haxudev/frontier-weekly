@@ -3,6 +3,8 @@ import { Noto_Serif_SC, Source_Serif_4, Inter } from 'next/font/google'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import MemoryBubble from '@/components/MemoryBubble'
 import BackToTop from '@/components/BackToTop'
+import Header from '@/components/Header'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 const notoSerifSC = Noto_Serif_SC({ 
   subsets: ['latin'],
@@ -30,21 +32,29 @@ const sourceSerif4 = Source_Serif_4({
 export const metadata = {
   title: '前沿今辰观',
   description: '无噪声前沿趋势发现与科技干货洞察',
+  icons: {
+    icon: '/icon.jpg',
+    shortcut: '/icon.jpg',
+    apple: '/icon.jpg',
+  },
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="zh" suppressHydrationWarning className={`${notoSerifSC.variable} ${sourceSerif4.variable} ${inter.variable}`}>
       <body className="antialiased font-sans">
-        <LanguageProvider>
-          <div className="min-h-screen">
-            <main>
-              {children}
-            </main>
-          </div>
-          <BackToTop />
-          <MemoryBubble />
-        </LanguageProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <div className="min-h-screen">
+              <Header />
+              <main>
+                {children}
+              </main>
+            </div>
+            <BackToTop />
+            <MemoryBubble />
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -2,7 +2,6 @@
 
 import WeekDots from '@/components/WeekDots'
 import BackToTop from '@/components/BackToTop'
-import LanguageToggle from '@/components/LanguageToggle'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useRef } from 'react'
 import { useCitationInteractions } from '@/lib/useCitationInteractions'
@@ -46,9 +45,6 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
             {t.subtitle[language]}
           </p>
 
-          <div className="animate-fade-in" style={{ animationDelay: '0.15s' }}>
-            <LanguageToggle />
-          </div>
         </div>
       </section>
 

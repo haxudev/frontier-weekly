@@ -12,6 +12,30 @@
   --accent: #b8860b;
   --accent-light: #d4a84b;
   --border: #e0d9cc;
+  --shadow-soft: 0 18px 42px rgba(0, 0, 0, 0.08);
+  --toggle-bg: rgba(235, 229, 217, 0.7);
+  --toggle-thumb: #ffffff;
+  --code-bg: #2d2a26;
+  --code-text: #e8e2d6;
+  --pill-bg: rgba(235, 229, 217, 0.9);
+}
+
+.dark {
+  --bg-primary: #0f1115;
+  --bg-secondary: #161b22;
+  --bg-card: #111821;
+  --text-primary: #f4f2eb;
+  --text-secondary: #d4cebe;
+  --text-muted: #a8a39a;
+  --accent: #d8b464;
+  --accent-light: #f0c56b;
+  --border: #1f2732;
+  --shadow-soft: 0 20px 48px rgba(0, 0, 0, 0.35);
+  --toggle-bg: rgba(255, 255, 255, 0.05);
+  --toggle-thumb: #1f2732;
+  --code-bg: #0b1017;
+  --code-text: #e4ddce;
+  --pill-bg: rgba(255, 255, 255, 0.06);
 }
 
 html {
@@ -26,6 +50,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 /* Custom scrollbar - subtle */
@@ -92,7 +117,7 @@ body {
 .markdown-content h3 {
   @apply text-base sm:text-lg font-semibold mt-8 mb-4 px-3 py-2 rounded;
   font-family: var(--font-serif), "Songti SC", "STSong", "SimSun", "Hiragino Mincho ProN", "Noto Serif CJK SC", serif;
-  background: rgba(235, 229, 217, 0.7);
+  background: var(--bg-secondary);
   border-left: 3px solid var(--accent);
   color: var(--text-primary);
 }
@@ -331,12 +356,12 @@ body {
 
 .markdown-content pre {
   @apply p-4 rounded-lg overflow-x-auto my-6;
-  background: #2d2a26;
+  background: var(--code-bg);
 }
 
 .markdown-content pre code {
   @apply bg-transparent p-0;
-  color: #e8e2d6;
+  color: var(--code-text);
 }
 
 .markdown-content table {
@@ -380,7 +405,7 @@ body {
 
 .keyword-pill {
   @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
-  background: rgba(235, 229, 217, 0.9);
+  background: var(--pill-bg);
   border: 1px solid var(--border);
   color: var(--text-secondary);
 }

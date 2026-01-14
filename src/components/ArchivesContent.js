@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import LanguageToggle from '@/components/LanguageToggle'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function ArchivesContent({ allWeeks }) {
@@ -88,9 +87,6 @@ export default function ArchivesContent({ allWeeks }) {
             {t.title[language]}
           </h1>
 
-          <div className="mt-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <LanguageToggle />
-          </div>
         </div>
       </section>
 
