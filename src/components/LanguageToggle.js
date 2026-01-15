@@ -28,7 +28,7 @@ export default function LanguageToggle({ className = '' }) {
   }
 
   return (
-    <div className={`relative inline-flex items-center gap-1 rounded-full border px-1.5 py-1 text-xs font-semibold shadow-sm transition-all duration-200 ${className}`} role="group" aria-label="Language switcher" style={{
+    <div className={`relative inline-flex items-center rounded-full border p-1 text-xs font-semibold shadow-sm transition-all duration-200 overflow-hidden ${className}`} role="group" aria-label="Language switcher" style={{
       background: 'var(--toggle-bg)',
       borderColor: 'var(--border)',
       boxShadow: 'var(--shadow-soft)',
@@ -36,7 +36,7 @@ export default function LanguageToggle({ className = '' }) {
     }}>
       <span
         aria-hidden="true"
-        className="absolute inset-y-1 w-1/2 rounded-full transition-transform duration-200"
+        className="pointer-events-none absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full transition-transform duration-200"
         style={{
           transform: isEn ? 'translateX(100%)' : 'translateX(0)',
           background: 'var(--toggle-thumb)',
