@@ -36,9 +36,10 @@ export default function LanguageToggle({ className = '' }) {
     }}>
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full transition-transform duration-200"
+        className="pointer-events-none absolute inset-y-1 rounded-full transition-all duration-200"
         style={{
-          transform: isEn ? 'translateX(100%)' : 'translateX(0)',
+          left: isEn ? 'calc(50% + 0.25rem)' : '0.25rem',
+          width: 'calc(50% - 0.5rem)',
           background: 'var(--toggle-thumb)',
           boxShadow: 'var(--shadow-soft)'
         }}
