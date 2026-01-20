@@ -6,11 +6,6 @@ const token = process.env.GITHUB_MODELS_TOKEN || process.env.GITHUB_TOKEN
 const endpoint = process.env.GITHUB_MODELS_ENDPOINT || process.env.GITHUB_MODEL_ENDPOINT || 'https://models.inference.ai.azure.com'
 const model = process.env.MODEL_ID || 'gpt-5'
 
-if (!token) {
-  console.error('Missing token. Set env GITHUB_MODELS_TOKEN (CI) or GITHUB_TOKEN (local).')
-  process.exit(1)
-}
-
 async function readList(filePath) {
   try {
     const txt = await fs.readFile(filePath, 'utf-8')
@@ -21,6 +16,10 @@ async function readList(filePath) {
 }
 
 async function translateMarkdown(markdown) {
+  if (!token) {
+    throw new Error('Missing token. Set env GITHUB_MODELS_TOKEN (CI) or GITHUB_TOKEN (local).')
+  }
+
   const body = {
     model,
     messages: [
@@ -67,11 +66,24 @@ async function main() {
     return
   }
   await fs.mkdir(path.join('content', 'en'), { recursive: true })
+
+  let needTranslateCount = 0
   for (const zhPath of zhFiles) {
     const base = path.basename(zhPath)
     const enPath = path.join('content', 'en', base)
     try {
       await fs.access(zhPath)
+
+      // If the English file already exists, do not re-translate/overwrite.
+      try {
+        await fs.access(enPath)
+        console.log(`Skip (en exists): ${zhPath} -> ${enPath}`)
+        continue
+      } catch {
+        // en does not exist; proceed.
+      }
+
+      needTranslateCount++
       const src = await fs.readFile(zhPath, 'utf-8')
       const out = await translateMarkdown(src)
       await fs.writeFile(enPath, out, 'utf-8')
@@ -80,6 +92,10 @@ async function main() {
       console.error(`Failed to translate ${zhPath}:`, e.message)
       process.exitCode = 1
     }
+  }
+
+  if (needTranslateCount === 0) {
+    console.log('Nothing to translate (all en files already exist).')
   }
 }
 

@@ -46,9 +46,9 @@ jobs:
           tmpfile="$(mktemp)"
           : > "$tmpfile"
 
-          # Files changed (added/modified) in this push
+          # Files added in this push (ONLY new posts)
           if [[ -n "$BASE" ]]; then
-            git diff --name-only --diff-filter=AM "$BASE" "$HEAD" -- 'content/zh/*.md' >> "$tmpfile" || true
+            git diff --name-only --diff-filter=A "$BASE" "$HEAD" -- 'content/zh/*.md' >> "$tmpfile" || true
           else
             git ls-files -- 'content/zh/*.md' >> "$tmpfile" || true
           fi
