@@ -11,7 +11,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "memory:stats": "node scripts/query-memory-source-stats.mjs"
+    "memory:stats": "node scripts/query-memory-source-stats.mjs",
+    "zh:terms": "node scripts/replace-zh-terms.mjs",
+    "zh:terms:check": "node scripts/replace-zh-terms.mjs --check"
   },
   "dependencies": {
     "date-fns": "^4.1.0",

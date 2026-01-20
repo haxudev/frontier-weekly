@@ -72,6 +72,11 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Replace zh terms (代理 -> Agent)
+        if: steps.detect.outputs.ADDED_ZH_COUNT != '0'
+        run: |
+          node scripts/replace-zh-terms.mjs --list added_zh_files.txt
+
       - name: Translate zh files to content/en with GitHub Models (Copilot)
         if: steps.detect.outputs.ADDED_ZH_COUNT != '0'
         env:
@@ -88,6 +93,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add content/zh/*.md || true
           git add content/en/*.md || true
           if git diff --cached --quiet; then
             echo "No changes to commit"
