@@ -21,6 +21,7 @@ export default function MobileShareFab({
   description = '',
   date = '',
   keywords = [],
+  toc = [],
   lang = 'zh'
 }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -199,6 +200,7 @@ export default function MobileShareFab({
           url={url}
           date={date}
           keywords={keywords}
+          toc={toc}
           onClose={() => setShowPoster(false)}
         />
       )}

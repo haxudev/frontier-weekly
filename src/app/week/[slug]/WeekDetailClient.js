@@ -101,6 +101,7 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
                 description={week.excerpt}
                 date={week.date}
                 keywords={week.keywords}
+                toc={week.toc}
               />
             </div>
           </article>
@@ -117,6 +118,7 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
         description={week.excerpt}
         date={week.date}
         keywords={week.keywords}
+        toc={week.toc}
         lang={language}
       />
 

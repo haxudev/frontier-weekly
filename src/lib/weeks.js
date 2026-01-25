@@ -113,6 +113,23 @@ function removeReferencesSection(contentHtml) {
   return contentHtml.replace(referencesPattern, '')
 }
 
+// Extract table of contents from h2 headings
+function extractToc(content) {
+  if (typeof content !== 'string' || !content) return []
+  
+  const toc = []
+  // Match Markdown h2 headings: ## Heading Text
+  const headingPattern = /^##\s+(.+)$/gm
+  let match
+  while ((match = headingPattern.exec(content)) !== null) {
+    const headingText = match[1].trim()
+    // Skip the references section
+    if (headingText === '引用' || headingText.toLowerCase() === 'references') continue
+    toc.push(headingText)
+  }
+  return toc
+}
+
 function getWeeksDirectory(locale = 'zh') {
   if (locale === 'en') {
     return path.join(process.cwd(), 'content/en')
@@ -262,6 +279,9 @@ export async function getWeekContent(slug, locale = 'zh') {
     return null
   }
 
+  // 提取目录（在预处理前从原始 Markdown 提取）
+  const toc = extractToc(week.content)
+
   // 预处理：修复中文标点与粗体/斜体的兼容问题
   const fixedContent = fixCjkEmphasis(week.content)
 
@@ -292,6 +312,7 @@ export async function getWeekContent(slug, locale = 'zh') {
   return {
     ...week,
     contentHtml,
+    toc,
   }
 }
 

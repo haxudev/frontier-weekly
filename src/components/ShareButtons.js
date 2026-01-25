@@ -15,7 +15,8 @@ export default function ShareButtons({
   url, 
   description = '',
   date = '',
-  keywords = [] 
+  keywords = [],
+  toc = []
 }) {
   const [copied, setCopied] = useState(false)
   const [showQRHint, setShowQRHint] = useState(false)
@@ -176,6 +177,7 @@ export default function ShareButtons({
           url={url}
           date={date}
           keywords={keywords}
+          toc={toc}
           onClose={() => setShowPoster(false)}
         />
       )}

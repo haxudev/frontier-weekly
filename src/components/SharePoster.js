@@ -19,6 +19,7 @@ export default function SharePoster({
   url, 
   date,
   keywords = [],
+  toc = [],
   onClose 
 }) {
   const [isGenerating, setIsGenerating] = useState(false)
@@ -85,12 +86,14 @@ export default function SharePoster({
     ctx.lineTo(width - 80, 180)
     ctx.stroke()
 
-    // 日期
+    // 日期（只显示日期部分，不含时间戳）
     if (date) {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
       ctx.font = '22px system-ui, -apple-system, sans-serif'
       ctx.textAlign = 'left'
-      ctx.fillText(date, 80, 230)
+      // 提取纯日期部分（格式如 2026-01-25 或 January 25, 2026）
+      const pureDate = date.split(' ')[0].split('T')[0]
+      ctx.fillText(pureDate, 80, 230)
     }
 
     // 标题（自动换行）
@@ -113,8 +116,35 @@ export default function SharePoster({
       yPos += 50
     }
 
-    // 摘要（自动换行）
-    if (excerpt) {
+    // 目录（如果有）
+    if (toc && toc.length > 0) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+      ctx.font = 'bold 24px system-ui, -apple-system, sans-serif'
+      ctx.fillText('目录', 80, yPos + 20)
+      yPos += 50
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
+      ctx.font = '22px system-ui, -apple-system, sans-serif'
+      const maxTocItems = Math.min(toc.length, 6)
+      for (let i = 0; i < maxTocItems; i++) {
+        const tocItem = toc[i]
+        const bulletText = `• ${tocItem}`
+        const tocLines = wrapText(ctx, bulletText, width - 180, 22)
+        tocLines.forEach((line, j) => {
+          if (yPos + 30 < height - 400) {
+            ctx.fillText(line, 90, yPos + 30)
+            yPos += 32
+          }
+        })
+      }
+      if (toc.length > 6) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
+        ctx.fillText(`...还有 ${toc.length - 6} 项`, 90, yPos + 30)
+        yPos += 32
+      }
+      yPos += 20
+    } else if (excerpt) {
+      // 如果没有目录，显示摘要
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
       ctx.font = '26px system-ui, -apple-system, sans-serif'
       const excerptLines = wrapText(ctx, excerpt, width - 160, 26)
