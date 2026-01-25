@@ -3,6 +3,7 @@
 import WeekDots from '@/components/WeekDots'
 import BackToTop from '@/components/BackToTop'
 import ShareButtons from '@/components/ShareButtons'
+import MobileShareFab from '@/components/MobileShareFab'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useRef, useState, useEffect } from 'react'
 import { useCitationInteractions } from '@/lib/useCitationInteractions'
@@ -108,6 +109,16 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
 
       {/* Back to Top */}
       <BackToTop />
+
+      {/* 移动端浮动分享按钮 */}
+      <MobileShareFab
+        title={week.title}
+        url={pageUrl}
+        description={week.excerpt}
+        date={week.date}
+        keywords={week.keywords}
+        lang={language}
+      />
 
       {/* Footer */}
       <footer 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 
 // 动态导入海报组件，避免 SSR 问题
@@ -8,7 +8,7 @@ const SharePoster = dynamic(() => import('./SharePoster'), { ssr: false })
 
 /**
  * 社交分享按钮组件
- * 支持微博、Twitter/X、复制链接（微信分享）、生成海报
+ * 支持 Web Share API、微博、Twitter/X、复制链接（微信分享）、生成海报
  */
 export default function ShareButtons({ 
   title, 
@@ -20,6 +20,12 @@ export default function ShareButtons({
   const [copied, setCopied] = useState(false)
   const [showQRHint, setShowQRHint] = useState(false)
   const [showPoster, setShowPoster] = useState(false)
+  const [canNativeShare, setCanNativeShare] = useState(false)
+
+  useEffect(() => {
+    // 检测是否支持 Web Share API
+    setCanNativeShare(typeof navigator !== 'undefined' && !!navigator.share)
+  }, [])
 
   const encodedUrl = encodeURIComponent(url)
   const encodedTitle = encodeURIComponent(title)
@@ -62,8 +68,37 @@ export default function ShareButtons({
     window.open(linkedInUrl, '_blank', 'width=600,height=500')
   }
 
+  // 使用 Web Share API 进行原生分享（移动端）
+  const handleNativeShare = async () => {
+    if (!navigator.share) return
+    
+    try {
+      await navigator.share({
+        title: title,
+        text: description || title,
+        url: url
+      })
+    } catch (err) {
+      // 用户取消分享或出错
+      if (err.name !== 'AbortError') {
+        console.error('Share failed:', err)
+      }
+    }
+  }
+
   return (
-    <div className="share-buttons flex flex-wrap items-center gap-3">
+    <div className="share-buttons flex flex-wrap items-center gap-2 sm:gap-3">
+      {/* 原生分享按钮 - 移动端优先显示 */}
+      {canNativeShare && (
+        <button
+          onClick={handleNativeShare}
+          className="share-btn share-btn-native"
+          title="分享到应用"
+        >
+          <NativeShareIcon />
+          <span>分享</span>
+        </button>
+      )}
       {/* 微信分享 - 复制链接 */}
       <button
         onClick={handleCopyLink}
@@ -196,6 +231,18 @@ function PosterIcon() {
       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
       <circle cx="8.5" cy="8.5" r="1.5"/>
       <polyline points="21 15 16 10 5 21"/>
+    </svg>
+  )
+}
+
+function NativeShareIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+      <circle cx="18" cy="5" r="3"/>
+      <circle cx="6" cy="12" r="3"/>
+      <circle cx="18" cy="19" r="3"/>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
     </svg>
   )
 }

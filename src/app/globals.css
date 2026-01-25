@@ -543,3 +543,76 @@ body {
 .share-hint {
   @apply mt-2 animate-fade-in;
 }
+
+/* Mobile Share FAB styles */
+.share-fab-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: slideUp 0.2s ease-out forwards;
+  opacity: 0;
+}
+
+.share-fab-label {
+  padding: 0.6rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+}
+
+.share-fab-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.share-fab-icon-share {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.share-fab-icon-copy {
+  background: var(--accent);
+}
+
+.share-fab-icon-poster {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+/* Native share button - green gradient */
+.share-btn-native {
+  background: linear-gradient(135deg, #07c160, #06ae56) !important;
+  border-color: #07c160 !important;
+  color: white !important;
+}
+
+.share-btn-native:hover {
+  background: linear-gradient(135deg, #06ae56, #059b4a) !important;
+}
+
+/* Responsive share buttons - smaller on mobile */
+@media (max-width: 640px) {
+  .share-btn {
+    @apply px-2.5 py-1.5 text-xs gap-1.5;
+  }
+  
+  .share-btn svg {
+    @apply w-3.5 h-3.5;
+  }
+  
+  .share-btn span {
+    @apply hidden;
+  }
+  
+  .share-btn-native span {
+    @apply inline;
+  }
+}
