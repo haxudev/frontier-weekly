@@ -2,8 +2,7 @@
 
 import WeekDots from '@/components/WeekDots'
 import BackToTop from '@/components/BackToTop'
-import ShareButtons from '@/components/ShareButtons'
-import MobileShareFab from '@/components/MobileShareFab'
+import ShareFab from '@/components/ShareFab'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useRef, useState, useEffect } from 'react'
 import { useCitationInteractions } from '@/lib/useCitationInteractions'
@@ -89,21 +88,6 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
               ref={contentRef}
               dangerouslySetInnerHTML={{ __html: week.contentHtml }}
             />
-
-            {/* 分享按钮 */}
-            <div className="mt-10 pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
-              <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
-                {language === 'zh' ? '分享这篇文章' : 'Share this article'}
-              </p>
-              <ShareButtons 
-                title={week.title}
-                url={pageUrl}
-                description={week.excerpt}
-                date={week.date}
-                keywords={week.keywords}
-                toc={week.toc}
-              />
-            </div>
           </article>
         </div>
       </section>
@@ -111,8 +95,8 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
       {/* Back to Top */}
       <BackToTop />
 
-      {/* 移动端浮动分享按钮 */}
-      <MobileShareFab
+      {/* 统一浮动分享按钮 */}
+      <ShareFab
         title={week.title}
         url={pageUrl}
         description={week.excerpt}

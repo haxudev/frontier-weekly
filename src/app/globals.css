@@ -476,9 +476,21 @@ body {
   @apply rounded-lg;
 }
 
-/* Share buttons */
-.share-buttons {
-  @apply py-4;
+/* Share buttons wrapper */
+.share-buttons-wrapper {
+  @apply py-4 relative;
+}
+
+.share-buttons-row {
+  @apply flex items-center gap-2;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.share-buttons-row::-webkit-scrollbar {
+  display: none;
 }
 
 .share-btn {
@@ -487,6 +499,8 @@ body {
   border: 1px solid var(--border);
   color: var(--text-secondary);
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .share-btn:hover {
@@ -564,6 +578,28 @@ body {
   white-space: nowrap;
 }
 
+/* 只显示图标的分享按钮 */
+.share-fab-icon-only {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: slideUp 0.2s ease-out forwards;
+  opacity: 0;
+  border: none;
+}
+
+.share-fab-icon-only:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
 .share-fab-icon {
   width: 44px;
   height: 44px;
@@ -577,6 +613,22 @@ body {
 
 .share-fab-icon-share {
   background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.share-fab-icon-wechat {
+  background: linear-gradient(135deg, #07c160, #06ae56);
+}
+
+.share-fab-icon-weibo {
+  background: linear-gradient(135deg, #e6162d, #d11425);
+}
+
+.share-fab-icon-twitter {
+  background: #000000;
+}
+
+.share-fab-icon-linkedin {
+  background: linear-gradient(135deg, #0077b5, #006699);
 }
 
 .share-fab-icon-copy {
@@ -614,5 +666,40 @@ body {
   
   .share-btn-native span {
     @apply inline;
+  }
+}
+
+/* Poster Modal - fixed overlay style */
+.poster-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.poster-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+/* 移动端海报弹窗 */
+@media (max-width: 640px) {
+  .poster-modal-content {
+    max-width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 }

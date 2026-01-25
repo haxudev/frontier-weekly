@@ -116,40 +116,59 @@ export default function SharePoster({
       yPos += 50
     }
 
-    // 目录（如果有）
-    if (toc && toc.length > 0) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-      ctx.font = 'bold 24px system-ui, -apple-system, sans-serif'
-      ctx.fillText('目录', 80, yPos + 20)
-      yPos += 50
+    // 内容要点（从目录提取，不显示"目录"标题）
+    // 过滤掉"目录"本身这个标题
+    const filteredToc = (toc || []).filter(item => 
+      item !== '目录' && item.toLowerCase() !== 'table of contents' && item.toLowerCase() !== 'contents'
+    )
+    
+    if (filteredToc.length > 0) {
+      // 添加一条细分隔线
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.3)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(80, yPos + 10)
+      ctx.lineTo(width - 80, yPos + 10)
+      ctx.stroke()
+      yPos += 35
       
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-      ctx.font = '22px system-ui, -apple-system, sans-serif'
-      const maxTocItems = Math.min(toc.length, 6)
-      for (let i = 0; i < maxTocItems; i++) {
-        const tocItem = toc[i]
-        const bulletText = `• ${tocItem}`
-        const tocLines = wrapText(ctx, bulletText, width - 180, 22)
-        tocLines.forEach((line, j) => {
-          if (yPos + 30 < height - 400) {
-            ctx.fillText(line, 90, yPos + 30)
-            yPos += 32
-          }
-        })
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'
+      ctx.font = '24px system-ui, -apple-system, sans-serif'
+      
+      // 计算可用空间，动态决定显示多少项
+      const availableHeight = height - 420 - yPos
+      const itemHeight = 38
+      const maxItems = Math.min(Math.floor(availableHeight / itemHeight), filteredToc.length, 5)
+      
+      for (let i = 0; i < maxItems; i++) {
+        const tocItem = filteredToc[i]
+        // 截取标题，确保不会太长
+        const displayText = tocItem.length > 28 ? tocItem.slice(0, 26) + '...' : tocItem
+        const bulletText = `›  ${displayText}`
+        ctx.fillText(bulletText, 80, yPos + 30)
+        yPos += itemHeight
       }
-      if (toc.length > 6) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
-        ctx.fillText(`...还有 ${toc.length - 6} 项`, 90, yPos + 30)
-        yPos += 32
+      
+      if (filteredToc.length > maxItems) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+        ctx.font = '20px system-ui, -apple-system, sans-serif'
+        ctx.fillText(`+${filteredToc.length - maxItems} 更多内容`, 80, yPos + 25)
       }
-      yPos += 20
     } else if (excerpt) {
       // 如果没有目录，显示摘要
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.3)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(80, yPos + 10)
+      ctx.lineTo(width - 80, yPos + 10)
+      ctx.stroke()
+      yPos += 35
+      
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-      ctx.font = '26px system-ui, -apple-system, sans-serif'
-      const excerptLines = wrapText(ctx, excerpt, width - 160, 26)
-      excerptLines.slice(0, 6).forEach((line, i) => {
-        ctx.fillText(line, 80, yPos + 30 + i * 40)
+      ctx.font = '24px system-ui, -apple-system, sans-serif'
+      const excerptLines = wrapText(ctx, excerpt, width - 160, 24)
+      excerptLines.slice(0, 4).forEach((line, i) => {
+        ctx.fillText(line, 80, yPos + 30 + i * 36)
       })
     }
 
@@ -241,34 +260,35 @@ export default function SharePoster({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+    <div className="poster-modal-overlay" onClick={onClose}>
       <div 
-        className="relative w-full max-w-md rounded-xl overflow-hidden"
+        className="poster-modal-content"
+        onClick={(e) => e.stopPropagation()}
         style={{ background: 'var(--bg-card)' }}
       >
         {/* 关闭按钮 */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full"
+          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full"
           style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}
         >
           ✕
         </button>
 
-        <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+        <div className="p-5">
+          <h3 className="text-base font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
             生成分享海报
           </h3>
 
           {!posterUrl ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                 生成精美海报，保存后可在微信朋友圈分享
               </p>
               <button
                 onClick={generatePoster}
                 disabled={isGenerating}
-                className="w-full py-3 rounded-lg font-medium transition-all"
+                className="w-full py-2.5 rounded-lg font-medium transition-all text-sm"
                 style={{ 
                   background: isGenerating ? 'var(--bg-secondary)' : 'var(--accent)',
                   color: isGenerating ? 'var(--text-muted)' : 'white'
@@ -278,27 +298,27 @@ export default function SharePoster({
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* 海报预览 */}
-              <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: '750/1334' }}>
+              <div className="relative rounded-lg overflow-hidden max-h-[300px]" style={{ aspectRatio: '750/1334' }}>
                 <img 
                   src={posterUrl} 
                   alt="分享海报" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
               
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <button
                   onClick={downloadPoster}
-                  className="flex-1 py-3 rounded-lg font-medium"
+                  className="flex-1 py-2 rounded-lg font-medium text-sm"
                   style={{ background: 'var(--accent)', color: 'white' }}
                 >
                   保存图片
                 </button>
                 <button
                   onClick={() => setPosterUrl(null)}
-                  className="flex-1 py-3 rounded-lg font-medium"
+                  className="flex-1 py-2 rounded-lg font-medium text-sm"
                   style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}
                 >
                   重新生成
@@ -306,7 +326,7 @@ export default function SharePoster({
               </div>
 
               <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
-                长按图片可保存到相册，然后在微信中分享
+                长按图片可保存到相册
               </p>
             </div>
           )}

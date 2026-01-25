@@ -123,8 +123,15 @@ function extractToc(content) {
   let match
   while ((match = headingPattern.exec(content)) !== null) {
     const headingText = match[1].trim()
-    // Skip the references section
-    if (headingText === '引用' || headingText.toLowerCase() === 'references') continue
+    // Skip the references section and generic toc headings
+    const lowerHeading = headingText.toLowerCase()
+    if (
+      headingText === '引用' || 
+      lowerHeading === 'references' ||
+      headingText === '目录' ||
+      lowerHeading === 'table of contents' ||
+      lowerHeading === 'contents'
+    ) continue
     toc.push(headingText)
   }
   return toc

@@ -88,83 +88,85 @@ export default function ShareButtons({
   }
 
   return (
-    <div className="share-buttons flex flex-wrap items-center gap-2 sm:gap-3">
-      {/* 原生分享按钮 - 移动端优先显示 */}
-      {canNativeShare && (
+    <div className="share-buttons-wrapper">
+      <div className="share-buttons-row">
+        {/* 原生分享按钮 - 移动端优先显示 */}
+        {canNativeShare && (
+          <button
+            onClick={handleNativeShare}
+            className="share-btn share-btn-native"
+            title="分享到应用"
+          >
+            <NativeShareIcon />
+            <span>分享</span>
+          </button>
+        )}
+        {/* 微信分享 - 复制链接 */}
         <button
-          onClick={handleNativeShare}
-          className="share-btn share-btn-native"
-          title="分享到应用"
+          onClick={handleCopyLink}
+          onMouseEnter={() => setShowQRHint(true)}
+          onMouseLeave={() => setShowQRHint(false)}
+          className="share-btn share-btn-wechat"
+          title="复制链接到微信分享"
         >
-          <NativeShareIcon />
-          <span>分享</span>
+          <WeChatIcon />
+          <span>{copied ? '已复制!' : '微信'}</span>
         </button>
-      )}
-      {/* 微信分享 - 复制链接 */}
-      <button
-        onClick={handleCopyLink}
-        onMouseEnter={() => setShowQRHint(true)}
-        onMouseLeave={() => setShowQRHint(false)}
-        className="share-btn share-btn-wechat"
-        title="复制链接到微信分享"
-      >
-        <WeChatIcon />
-        <span>{copied ? '已复制!' : '微信'}</span>
-      </button>
 
-      {/* 微博 */}
-      <button
-        onClick={shareToWeibo}
-        className="share-btn share-btn-weibo"
-        title="分享到微博"
-      >
-        <WeiboIcon />
-        <span>微博</span>
-      </button>
+        {/* 微博 */}
+        <button
+          onClick={shareToWeibo}
+          className="share-btn share-btn-weibo"
+          title="分享到微博"
+        >
+          <WeiboIcon />
+          <span>微博</span>
+        </button>
 
-      {/* Twitter/X */}
-      <button
-        onClick={shareToTwitter}
-        className="share-btn share-btn-twitter"
-        title="分享到 Twitter/X"
-      >
-        <TwitterIcon />
-        <span>Twitter</span>
-      </button>
+        {/* Twitter/X */}
+        <button
+          onClick={shareToTwitter}
+          className="share-btn share-btn-twitter"
+          title="分享到 Twitter/X"
+        >
+          <TwitterIcon />
+          <span>Twitter</span>
+        </button>
 
-      {/* LinkedIn */}
-      <button
-        onClick={shareToLinkedIn}
-        className="share-btn share-btn-linkedin"
-        title="分享到 LinkedIn"
-      >
-        <LinkedInIcon />
-        <span>LinkedIn</span>
-      </button>
+        {/* LinkedIn */}
+        <button
+          onClick={shareToLinkedIn}
+          className="share-btn share-btn-linkedin"
+          title="分享到 LinkedIn"
+        >
+          <LinkedInIcon />
+          <span>LinkedIn</span>
+        </button>
 
-      {/* 复制链接 */}
-      <button
-        onClick={handleCopyLink}
-        className="share-btn share-btn-copy"
-        title="复制链接"
-      >
-        <CopyIcon />
-        <span>{copied ? '已复制!' : '复制链接'}</span>
-      </button>
+        {/* 复制链接 */}
+        <button
+          onClick={handleCopyLink}
+          className="share-btn share-btn-copy"
+          title="复制链接"
+        >
+          <CopyIcon />
+          <span>{copied ? '已复制!' : '复制链接'}</span>
+        </button>
 
-      {/* 生成海报 */}
-      <button
-        onClick={() => setShowPoster(true)}
-        className="share-btn share-btn-poster"
-        title="生成分享海报"
-      >
-        <PosterIcon />
-        <span>生成海报</span>
-      </button>
+        {/* 生成海报 */}
+        <button
+          onClick={() => setShowPoster(true)}
+          className="share-btn share-btn-poster"
+          title="生成分享海报"
+        >
+          <PosterIcon />
+          <span>生成海报</span>
+        </button>
+      </div>
 
       {/* 微信分享提示 */}
       {showQRHint && (
-        <div className="share-hint text-xs" style={{ color: 'var(--text-muted)' }}>
+        <div className="share-hint text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
           链接已复制，请在微信中粘贴分享
         </div>
       )}

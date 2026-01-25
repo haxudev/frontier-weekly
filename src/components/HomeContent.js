@@ -4,8 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useRef, useState, useEffect } from 'react'
 import WeekDots from '@/components/WeekDots'
-import ShareButtons from '@/components/ShareButtons'
-import MobileShareFab from '@/components/MobileShareFab'
+import ShareFab from '@/components/ShareFab'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useCitationInteractions } from '@/lib/useCitationInteractions'
 
@@ -45,10 +44,6 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
     noContent: {
       zh: '暂无内容，敬请期待',
       en: 'Content coming soon'
-    },
-    share: {
-      zh: '分享这篇文章',
-      en: 'Share this article'
     }
   }
 
@@ -114,21 +109,6 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
                   dangerouslySetInnerHTML={{ __html: latestWeek.contentHtml }}
                 />
               )}
-
-              {/* 分享按钮 */}
-              <div className="mt-10 pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
-                <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
-                  {t.share[language]}
-                </p>
-                <ShareButtons 
-                  title={latestWeek.title}
-                  url={pageUrl}
-                  description={latestWeek.excerpt}
-                  date={latestWeek.date}
-                  keywords={latestWeek.keywords}
-                  toc={latestWeek.toc}
-                />
-              </div>
             </article>
           ) : (
             <div 
@@ -158,9 +138,9 @@ export default function HomeContent({ latestWeek, recentWeeks }) {
         </div>
       </section>
 
-      {/* 移动端浮动分享按钮 */}
+      {/* 统一浮动分享按钮 */}
       {latestWeek && (
-        <MobileShareFab
+        <ShareFab
           title={latestWeek.title}
           url={pageUrl}
           description={latestWeek.excerpt}
