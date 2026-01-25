@@ -43,9 +43,16 @@ export default function SharePoster({
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     
-    // 海报尺寸 (适合微信分享)
+    // 海报尺寸 - 动态计算高度以容纳所有目录项
     const width = 750
-    const height = 1334
+    const filteredToc = (toc || []).filter(item => 
+      item !== '目录' && item.toLowerCase() !== 'table of contents' && item.toLowerCase() !== 'contents'
+    )
+    // 基础高度 + 每个目录项的高度
+    const baseHeight = 1000
+    const tocItemHeight = 36
+    const additionalHeight = Math.max(0, (filteredToc.length - 5) * tocItemHeight)
+    const height = Math.min(Math.max(baseHeight + additionalHeight, 1100), 2000)
     canvas.width = width
     canvas.height = height
 
@@ -117,10 +124,7 @@ export default function SharePoster({
     }
 
     // 内容要点（从目录提取，不显示"目录"标题）
-    // 过滤掉"目录"本身这个标题
-    const filteredToc = (toc || []).filter(item => 
-      item !== '目录' && item.toLowerCase() !== 'table of contents' && item.toLowerCase() !== 'contents'
-    )
+    // filteredToc 已在前面计算好
     
     if (filteredToc.length > 0) {
       // 添加一条细分隔线
@@ -135,24 +139,21 @@ export default function SharePoster({
       ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'
       ctx.font = '24px system-ui, -apple-system, sans-serif'
       
-      // 计算可用空间，动态决定显示多少项
-      const availableHeight = height - 420 - yPos
-      const itemHeight = 38
-      const maxItems = Math.min(Math.floor(availableHeight / itemHeight), filteredToc.length, 5)
+      // 显示所有目录项
+      const itemHeight = 36
       
-      for (let i = 0; i < maxItems; i++) {
-        const tocItem = filteredToc[i]
-        // 截取标题，确保不会太长
-        const displayText = tocItem.length > 28 ? tocItem.slice(0, 26) + '...' : tocItem
+      for (let i = 0; i < filteredToc.length; i++) {
+        let tocItem = filteredToc[i]
+        // 只取冒号之后的部分
+        const colonIndex = tocItem.indexOf('：') !== -1 ? tocItem.indexOf('：') : tocItem.indexOf(':')
+        if (colonIndex !== -1) {
+          tocItem = tocItem.slice(colonIndex + 1).trim()
+        }
+        // 按显示宽度截取（22个中文字符宽度）
+        const displayText = truncateByWidth(tocItem, 22)
         const bulletText = `›  ${displayText}`
         ctx.fillText(bulletText, 80, yPos + 30)
         yPos += itemHeight
-      }
-      
-      if (filteredToc.length > maxItems) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-        ctx.font = '20px system-ui, -apple-system, sans-serif'
-        ctx.fillText(`+${filteredToc.length - maxItems} 更多内容`, 80, yPos + 25)
       }
     } else if (excerpt) {
       // 如果没有目录，显示摘要
@@ -172,10 +173,10 @@ export default function SharePoster({
       })
     }
 
-    // 二维码区域
-    const qrSize = 180
+    // 二维码区域 - 相对于内容结束位置
+    const qrSize = 160
     const qrX = width / 2 - qrSize / 2
-    const qrY = height - 350
+    const qrY = yPos + 60
 
     // 二维码背景
     ctx.fillStyle = '#ffffff'
@@ -200,12 +201,12 @@ export default function SharePoster({
     ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
     ctx.font = '22px system-ui, -apple-system, sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText('长按识别二维码阅读原文', width / 2, height - 120)
+    ctx.fillText('长按识别二维码阅读原文', width / 2, qrY + qrSize + 60)
 
     // 底部水印
     ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'
     ctx.font = '18px system-ui, -apple-system, sans-serif'
-    ctx.fillText('Frontier Daily · 前沿今辰观', width / 2, height - 60)
+    ctx.fillText('Frontier Daily · 前沿今辰观', width / 2, qrY + qrSize + 110)
 
     // 转换为图片 URL
     const dataUrl = canvas.toDataURL('image/png', 1.0)
@@ -238,6 +239,35 @@ export default function SharePoster({
     return lines
   }
 
+  // 计算字符显示宽度（中文=1，英文/数字=0.5）
+  function getDisplayWidth(text) {
+    let width = 0
+    for (const char of text) {
+      // 中文字符范围
+      if (/[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/.test(char)) {
+        width += 1
+      } else {
+        width += 0.5
+      }
+    }
+    return width
+  }
+
+  // 按显示宽度截取文本
+  function truncateByWidth(text, maxWidth) {
+    let width = 0
+    let result = ''
+    for (const char of text) {
+      const charWidth = /[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/.test(char) ? 1 : 0.5
+      if (width + charWidth > maxWidth) {
+        return result + '...'
+      }
+      width += charWidth
+      result += char
+    }
+    return result
+  }
+
   // 加载图片
   function loadImage(src) {
     return new Promise((resolve, reject) => {
@@ -264,31 +294,31 @@ export default function SharePoster({
       <div 
         className="poster-modal-content"
         onClick={(e) => e.stopPropagation()}
-        style={{ background: 'var(--bg-card)' }}
+        style={{ background: 'var(--bg-card)', maxWidth: '360px' }}
       >
         {/* 关闭按钮 */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full"
+          className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center rounded-full text-sm"
           style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}
         >
           ✕
         </button>
 
-        <div className="p-5">
-          <h3 className="text-base font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+        <div className="p-4">
+          <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
             生成分享海报
           </h3>
 
           {!posterUrl ? (
-            <div className="space-y-3">
-              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            <div className="space-y-2">
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                 生成精美海报，保存后可在微信朋友圈分享
               </p>
               <button
                 onClick={generatePoster}
                 disabled={isGenerating}
-                className="w-full py-2.5 rounded-lg font-medium transition-all text-sm"
+                className="w-full py-2 rounded-md font-medium transition-all text-xs"
                 style={{ 
                   background: isGenerating ? 'var(--bg-secondary)' : 'var(--accent)',
                   color: isGenerating ? 'var(--text-muted)' : 'white'
@@ -299,26 +329,29 @@ export default function SharePoster({
             </div>
           ) : (
             <div className="space-y-3">
-              {/* 海报预览 */}
-              <div className="relative rounded-lg overflow-hidden max-h-[300px]" style={{ aspectRatio: '750/1334' }}>
-                <img 
-                  src={posterUrl} 
-                  alt="分享海报" 
-                  className="w-full h-full object-contain"
-                />
+              {/* 海报预览 - 居中显示 */}
+              <div className="flex justify-center">
+                <div className="relative rounded-lg overflow-hidden shadow-lg" style={{ maxHeight: '60vh' }}>
+                  <img 
+                    src={posterUrl} 
+                    alt="分享海报" 
+                    className="h-auto max-h-[60vh] w-auto"
+                    style={{ maxWidth: '100%' }}
+                  />
+                </div>
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-2 justify-center">
                 <button
                   onClick={downloadPoster}
-                  className="flex-1 py-2 rounded-lg font-medium text-sm"
+                  className="px-4 py-1.5 rounded-md font-medium text-xs"
                   style={{ background: 'var(--accent)', color: 'white' }}
                 >
                   保存图片
                 </button>
                 <button
                   onClick={() => setPosterUrl(null)}
-                  className="flex-1 py-2 rounded-lg font-medium text-sm"
+                  className="px-4 py-1.5 rounded-md font-medium text-xs"
                   style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}
                 >
                   重新生成

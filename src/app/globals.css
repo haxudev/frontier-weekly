@@ -580,24 +580,28 @@ body {
 
 /* 只显示图标的分享按钮 */
 .share-fab-icon-only {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  animation: slideUp 0.2s ease-out forwards;
-  opacity: 0;
+  opacity: 1;
   border: none;
+}
+
+.share-fab-icon-only svg {
+  width: 16px;
+  height: 16px;
 }
 
 .share-fab-icon-only:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
 }
 
 .share-fab-icon {
@@ -633,6 +637,22 @@ body {
 
 .share-fab-icon-copy {
   background: var(--accent);
+}
+
+.share-fab-icon-copied {
+  background: linear-gradient(135deg, #10b981, #059669);
+  animation: copiedPulse 0.3s ease-out;
+}
+
+@keyframes copiedPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fabPop {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .share-fab-icon-poster {
@@ -688,17 +708,18 @@ body {
 .poster-modal-content {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 340px;
+  max-height: 85vh;
   border-radius: 0.75rem;
   border: 1px solid var(--border);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* 移动端海报弹窗 */
 @media (max-width: 640px) {
   .poster-modal-content {
-    max-width: 100%;
+    max-width: 92%;
     max-height: 90vh;
     overflow-y: auto;
   }

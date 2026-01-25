@@ -27,10 +27,21 @@ export default function ShareFab({
   const [showPoster, setShowPoster] = useState(false)
   const [copied, setCopied] = useState(false)
   const [canShare, setCanShare] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     // 检测是否支持 Web Share API
     setCanShare(typeof navigator !== 'undefined' && !!navigator.share)
+
+    // 粗略检测是否为移动端（用于隐藏 PC 端微信按钮）
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+      const ua = navigator.userAgent || ''
+      const uaMobile = !!navigator.userAgentData?.mobile
+      const uaRegexMobile = /Android|iPhone|iPad|iPod|Mobile|Mobi/i.test(ua)
+      const hasTouch = typeof navigator.maxTouchPoints === 'number' && navigator.maxTouchPoints > 1
+      const smallScreen = typeof window.innerWidth === 'number' && window.innerWidth < 1024
+      setIsMobile(uaMobile || uaRegexMobile || (hasTouch && smallScreen))
+    }
   }, [])
 
   // 多语言文本
@@ -139,7 +150,7 @@ export default function ShareFab({
       {isOpen && (
         <div 
           className="fixed bottom-[140px] right-5 z-[65] flex flex-col gap-2 items-end"
-          style={{ animation: 'slideUp 0.2s ease-out' }}
+          style={{ animation: 'fabPop 0.18s ease-out' }}
         >
           {/* 原生分享（移动端） */}
           {canShare && (
@@ -152,14 +163,16 @@ export default function ShareFab({
             </button>
           )}
 
-          {/* 微信 - 复制链接 */}
-          <button 
-            onClick={handleCopyLink} 
-            className="share-fab-icon-only share-fab-icon-wechat"
-            title={copied ? t.copied : t.wechat}
-          >
-            <WeChatIcon />
-          </button>
+          {/* 微信 - 复制链接（仅移动端显示，PC端与复制链接功能重复） */}
+          {isMobile && (
+            <button 
+              onClick={handleCopyLink} 
+              className="share-fab-icon-only share-fab-icon-wechat"
+              title={t.wechat}
+            >
+              <WeChatIcon />
+            </button>
+          )}
 
           {/* 微博 */}
           <button 
@@ -191,10 +204,10 @@ export default function ShareFab({
           {/* 复制链接 */}
           <button 
             onClick={handleCopyLink} 
-            className="share-fab-icon-only share-fab-icon-copy"
+            className={`share-fab-icon-only ${copied ? 'share-fab-icon-copied' : 'share-fab-icon-copy'}`}
             title={copied ? t.copied : t.copyLink}
           >
-            <CopyIcon />
+            {copied ? <CheckIcon /> : <CopyIcon />}
           </button>
 
           {/* 生成海报 */}
@@ -308,6 +321,15 @@ function CopyIcon() {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
       <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    </svg>
+  )
+}
+
+// 勾选图标（复制成功状态）
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-5 h-5">
+      <polyline points="20 6 9 17 4 12"/>
     </svg>
   )
 }
