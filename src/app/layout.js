@@ -5,6 +5,7 @@ import MemoryBubble from '@/components/MemoryBubble'
 import BackToTop from '@/components/BackToTop'
 import Header from '@/components/Header'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import { siteConfig } from '@/lib/siteConfig'
 
 const notoSerifSC = Noto_Serif_SC({ 
   subsets: ['latin'],
@@ -37,6 +38,33 @@ export const metadata = {
     shortcut: '/icon.jpg',
     apple: '/icon.jpg',
   },
+  // 默认 Open Graph 配置
+  openGraph: {
+    title: '前沿今辰观',
+    description: '无噪声前沿趋势发现与科技干货洞察',
+    url: siteConfig.url,
+    siteName: '前沿今辰观',
+    type: 'website',
+    locale: 'zh_CN',
+    images: [
+      {
+        url: `${siteConfig.url}/api/og?title=${encodeURIComponent('前沿今辰观')}&lang=zh`,
+        width: 1200,
+        height: 630,
+        alt: '前沿今辰观',
+      },
+    ],
+  },
+  // 默认 Twitter Card 配置
+  twitter: {
+    card: 'summary_large_image',
+    title: '前沿今辰观',
+    description: '无噪声前沿趋势发现与科技干货洞察',
+    images: [`${siteConfig.url}/api/og?title=${encodeURIComponent('前沿今辰观')}&lang=zh`],
+  },
+  // 其他 meta
+  metadataBase: new URL(siteConfig.url),
+  authors: [{ name: siteConfig.author.name }],
 }
 
 export default function RootLayout({ children }) {

@@ -475,3 +475,71 @@ body {
   border: 1px solid var(--border);
   @apply rounded-lg;
 }
+
+/* Share buttons */
+.share-buttons {
+  @apply py-4;
+}
+
+.share-btn {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.share-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.share-btn:active {
+  transform: translateY(0);
+}
+
+/* 微信绿 */
+.share-btn-wechat:hover {
+  background: #07c160;
+  border-color: #07c160;
+  color: white;
+}
+
+/* 微博红橙 */
+.share-btn-weibo:hover {
+  background: #e6162d;
+  border-color: #e6162d;
+  color: white;
+}
+
+/* Twitter/X 黑 */
+.share-btn-twitter:hover {
+  background: #000000;
+  border-color: #000000;
+  color: white;
+}
+
+/* LinkedIn 蓝 */
+.share-btn-linkedin:hover {
+  background: #0077b5;
+  border-color: #0077b5;
+  color: white;
+}
+
+/* 复制链接 */
+.share-btn-copy:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* 生成海报 - 紫色渐变 */
+.share-btn-poster:hover {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-color: #6366f1;
+  color: white;
+}
+
+.share-hint {
+  @apply mt-2 animate-fade-in;
+}

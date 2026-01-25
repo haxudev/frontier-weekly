@@ -2,14 +2,21 @@
 
 import WeekDots from '@/components/WeekDots'
 import BackToTop from '@/components/BackToTop'
+import ShareButtons from '@/components/ShareButtons'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useCitationInteractions } from '@/lib/useCitationInteractions'
 
 export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
   const { language } = useLanguage()
   const contentMaxWidth = language === 'en' ? 'max-w-4xl' : 'max-w-3xl'
   const contentRef = useRef(null)
+  
+  // 获取当前页面 URL（客户端）
+  const [pageUrl, setPageUrl] = useState('')
+  useEffect(() => {
+    setPageUrl(window.location.href)
+  }, [])
 
   useCitationInteractions(contentRef, [week?.contentHtml])
 
@@ -81,6 +88,20 @@ export default function WeekDetailClient({ week, recentWeeks, currentSlug }) {
               ref={contentRef}
               dangerouslySetInnerHTML={{ __html: week.contentHtml }}
             />
+
+            {/* 分享按钮 */}
+            <div className="mt-10 pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
+              <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
+                {language === 'zh' ? '分享这篇文章' : 'Share this article'}
+              </p>
+              <ShareButtons 
+                title={week.title}
+                url={pageUrl}
+                description={week.excerpt}
+                date={week.date}
+                keywords={week.keywords}
+              />
+            </div>
           </article>
         </div>
       </section>
