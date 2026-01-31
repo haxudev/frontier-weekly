@@ -129,7 +129,7 @@ function extractToc(content) {
       headingText === '引用' || 
       lowerHeading === 'references' ||
       headingText === '目录' ||
-      lowerHeading === 'table of contents' ||
+      lowerHeading.startsWith('table of contents') ||
       lowerHeading === 'contents'
     ) continue
     toc.push(headingText)
