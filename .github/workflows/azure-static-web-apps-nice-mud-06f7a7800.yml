@@ -68,10 +68,9 @@ jobs:
           action: "upload"
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "/" # App source code path
+          app_location: "out" # Upload prebuilt static export output
           api_location: "" # Api source code path - optional
-          output_location: "out" # Built app content directory - Next.js static export
-          skip_app_build: true # Prevents Oryx from trying to install Python/Node
+          skip_app_build: true # Build already done above; just upload
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
