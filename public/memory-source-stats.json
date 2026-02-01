@@ -1,0 +1,65 @@
+{
+  "total": 9271,
+  "top": [
+    {
+      "source": "hackernews",
+      "count": 2751,
+      "percent": 29.67317441484198
+    },
+    {
+      "source": "arXiv",
+      "count": 830,
+      "percent": 8.952648042282387
+    },
+    {
+      "source": "bloomberg-technology",
+      "count": 803,
+      "percent": 8.661417322834646
+    },
+    {
+      "source": "slashdot",
+      "count": 631,
+      "percent": 6.806169776723115
+    },
+    {
+      "source": "huggingface:papers",
+      "count": 582,
+      "percent": 6.277639952540179
+    },
+    {
+      "source": "theverge",
+      "count": 581,
+      "percent": 6.26685362959767
+    },
+    {
+      "source": "producthunt",
+      "count": 469,
+      "percent": 5.058785460036674
+    },
+    {
+      "source": "techcrunch",
+      "count": 455,
+      "percent": 4.907776938841549
+    },
+    {
+      "source": "lobste.rs",
+      "count": 429,
+      "percent": 4.627332542336317
+    },
+    {
+      "source": "ai-techpark",
+      "count": 341,
+      "percent": 3.6781361233955345
+    }
+  ],
+  "other": {
+    "count": 1399,
+    "percent": 15.090065796569949,
+    "sources": 49
+  },
+  "generatedAt": "2026-02-01T07:56:47.346Z",
+  "tried": {
+    "schema": "public",
+    "table": "memory_source_stats"
+  }
+}

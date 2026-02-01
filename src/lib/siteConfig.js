@@ -55,5 +55,5 @@ export function getPageUrl(path = '', lang = 'zh') {
  */
 export function getOgImageUrl(title, lang = 'zh') {
   const base = siteConfig.url
-  return `${base}/api/og?title=${encodeURIComponent(title)}&lang=${lang}`
+  return `${base}/icon.jpg`
 }

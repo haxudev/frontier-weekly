@@ -48,7 +48,7 @@ export const metadata = {
     locale: 'zh_CN',
     images: [
       {
-        url: `${siteConfig.url}/api/og?title=${encodeURIComponent('前沿今辰观')}&lang=zh`,
+        url: `${siteConfig.url}/icon.jpg`,
         width: 1200,
         height: 630,
         alt: '前沿今辰观',
@@ -60,7 +60,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: '前沿今辰观',
     description: '无噪声前沿趋势发现与科技干货洞察',
-    images: [`${siteConfig.url}/api/og?title=${encodeURIComponent('前沿今辰观')}&lang=zh`],
+    images: [`${siteConfig.url}/icon.jpg`],
   },
   // 其他 meta
   metadataBase: new URL(siteConfig.url),

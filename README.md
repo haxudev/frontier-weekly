@@ -139,7 +139,7 @@ npm run build
 ### 展示与接口
 
 - 展示：全站右下角浮动按钮「记忆 / Memory」，点击弹出统计泡泡
-- API：`/api/memory-source-stats?top=10`
+- 静态数据：`/memory-source-stats.json`（构建期生成）
 
 如果你看到 404 且错误里带 `PGRST205`，通常表示 PostgREST 找不到 `public.memory_source_stats`（表/视图不存在，或不在暴露的 schema）。
 
@@ -153,6 +153,12 @@ npm run build
 ```bash
 npm run memory:stats
 ```
+
+### 说明（静态导出）
+
+本项目启用了 Next.js 静态导出（`output: 'export'`），因此不使用 `app/api/*` 路由。
+记忆统计数据会在构建阶段尝试从 Supabase 拉取并写入 `public/memory-source-stats.json`；
+如果构建环境未配置 Supabase 变量，将生成空数据以保证静态站点可以正常构建与部署。
 
 ## 📄 License
 

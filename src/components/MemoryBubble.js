@@ -115,7 +115,7 @@ export default function MemoryBubble() {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch('/api/memory-source-stats?top=10', {
+        const res = await fetch('/memory-source-stats.json', {
           headers: { Accept: 'application/json' },
         })
         const json = await res
