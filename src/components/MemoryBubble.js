@@ -1,8 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { usePathname } from 'next/navigation'
 import { useLanguage } from '@/contexts/LanguageContext'
+
+// Supabase public anon key (safe to expose in client code)
+const SUPABASE_URL = 'https://dcpgrxtsiimllmiucnta.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_O4QuNFo9mQ6fmipD2RBNbA_bJWLsXDN'
 
 function formatNumber(value, language) {
   try {
@@ -76,10 +79,74 @@ function generateDonutPaths(items, cx, cy, outerR, innerR) {
   return paths
 }
 
+// 实时从 Supabase 查询统计数据
+async function fetchMemoryStats() {
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    throw new Error('Missing Supabase configuration')
+  }
+
+  const base = SUPABASE_URL.endsWith('/') ? SUPABASE_URL : `${SUPABASE_URL}/`
+  const url = new URL('rest/v1/memory_source_stats', base)
+  url.searchParams.set('select', '*')
+
+  const res = await fetch(url.toString(), {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      Accept: 'application/json',
+    },
+  })
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(`${res.status}: ${text.slice(0, 200)}`)
+  }
+
+  const rows = await res.json()
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return { total: 0, top: [], other: { count: 0, percent: 0, sources: 0 } }
+  }
+
+  // 合并同类项（如 arxiv-xxx -> arXiv）
+  const merged = new Map()
+  for (const row of rows) {
+    let source = row.source || row.source_name || row.name || ''
+    const count = row.count || row.cnt || row.total || 0
+    if (!source || typeof count !== 'number') continue
+
+    if (source.startsWith('rss:')) source = source.slice(4)
+    if (source.toLowerCase().startsWith('arxiv')) source = 'arXiv'
+
+    const existing = merged.get(source)
+    merged.set(source, (existing || 0) + count)
+  }
+
+  const items = Array.from(merged.entries())
+    .map(([source, count]) => ({ source, count }))
+    .sort((a, b) => b.count - a.count)
+
+  const total = items.reduce((sum, i) => sum + i.count, 0)
+  const topN = 10
+  const topItems = items.slice(0, topN).map((i) => ({
+    ...i,
+    percent: total ? (i.count / total) * 100 : 0,
+  }))
+  const restItems = items.slice(topN)
+  const otherCount = restItems.reduce((sum, i) => sum + i.count, 0)
+
+  return {
+    total,
+    top: topItems,
+    other: {
+      count: otherCount,
+      percent: total ? (otherCount / total) * 100 : 0,
+      sources: restItems.length,
+    },
+  }
+}
+
 export default function MemoryBubble() {
   const { language } = useLanguage()
-  const pathname = usePathname() || '/'
-  const isEn = pathname === '/en' || pathname.startsWith('/en/')
 
   const [open, setOpen] = useState(false)
   const [data, setData] = useState(null)
@@ -97,12 +164,8 @@ export default function MemoryBubble() {
       other: { zh: '其他', en: 'Other' },
       loading: { zh: '正在加载…', en: 'Loading…' },
       empty: { zh: '暂无统计数据', en: 'No stats available' },
-      error: { zh: '统计加载失败', en: 'Failed to load stats' },
+      error: { zh: '查询失败', en: 'Query failed' },
       close: { zh: '关闭', en: 'Close' },
-      hint: {
-        zh: '提示：若出现 PGRST205，说明 PostgREST 找不到 public.memory_source_stats（表/视图名或 schema 不对，或未暴露）。',
-        en: 'Hint: PGRST205 usually means PostgREST cannot find public.memory_source_stats (wrong table/schema or not exposed).',
-      },
     }),
     []
   )
@@ -115,19 +178,8 @@ export default function MemoryBubble() {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch('/memory-source-stats.json', {
-          headers: { Accept: 'application/json' },
-        })
-        const json = await res
-          .json()
-          .catch(async () => ({ error: await res.text().catch(() => '') }))
-        if (!res.ok) {
-          const supa = json?.supabaseError
-          const supaMsg =
-            supa?.code && supa?.message ? `${supa.code}: ${supa.message}` : supa?.message
-          throw new Error(supaMsg || json?.error || `HTTP ${res.status}`)
-        }
-        if (!cancelled) setData(json)
+        const stats = await fetchMemoryStats()
+        if (!cancelled) setData(stats)
       } catch (e) {
         if (!cancelled) setError(e?.message || 'Unknown error')
       } finally {
@@ -286,15 +338,12 @@ export default function MemoryBubble() {
                     {t.loading[language]}
                   </div>
                 ) : error ? (
-                  <div className="py-2">
+                  <div className="py-6 text-center">
                     <div className="text-sm" style={{ color: 'var(--text-primary)' }}>
                       {t.error[language]}
                     </div>
                     <div className="mt-2 text-xs" style={{ color: 'var(--text-muted)' }}>
-                      {t.hint[language]}
-                    </div>
-                    <div className="mt-3 text-xs" style={{ color: 'var(--text-muted)' }}>
-                      {String(error).slice(0, 260)}
+                      {String(error).slice(0, 200)}
                     </div>
                   </div>
                 ) : chartItems.length === 0 ? (

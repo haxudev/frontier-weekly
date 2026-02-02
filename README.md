@@ -127,38 +127,9 @@ npm run build
 
 ## 🧠 记忆统计（Supabase）
 
-本项目新增了一个记忆来源统计页面，用于展示 `memory_source_stats` 的 Top 10 来源占比，并将其余来源合并到“其他”。
+右下角浮动按钮「记忆 / Memory」点击后实时查询 Supabase `memory_source_stats` 表，展示 Top 10 来源占比。
 
-### 环境变量
-
-参考 [.env.example](.env.example) 添加到 `.env.local`：
-
-- `SUPABASE_URL`
-- `SUPABASE_PUBLIC_KEY`（Supabase anon/publishable key）
-
-### 展示与接口
-
-- 展示：全站右下角浮动按钮「记忆 / Memory」，点击弹出统计泡泡
-- 静态数据：`/memory-source-stats.json`（构建期生成）
-
-如果你看到 404 且错误里带 `PGRST205`，通常表示 PostgREST 找不到 `public.memory_source_stats`（表/视图不存在，或不在暴露的 schema）。
-
-可通过环境变量自定义：
-
-- `MEMORY_SOURCE_STATS_TABLE`（默认 `memory_source_stats`）
-- `MEMORY_SOURCE_STATS_SCHEMA`（默认 `public`，会作为 `Accept-Profile` 发送给 PostgREST）
-
-### 本地命令行查询
-
-```bash
-npm run memory:stats
-```
-
-### 说明（静态导出）
-
-本项目启用了 Next.js 静态导出（`output: 'export'`），因此不使用 `app/api/*` 路由。
-记忆统计数据会在构建阶段尝试从 Supabase 拉取并写入 `public/memory-source-stats.json`；
-如果构建环境未配置 Supabase 变量，将生成空数据以保证静态站点可以正常构建与部署。
+配置硬编码在 `src/components/MemoryBubble.js` 中（Supabase anon key 本就设计为公开暴露）。
 
 ## 📄 License
 
