@@ -2,9 +2,35 @@ import fs from 'fs/promises'
 import path from 'path'
 
 const listFile = process.argv[2] || 'added_zh_files.txt'
-const token = process.env.GITHUB_MODELS_TOKEN || process.env.GITHUB_TOKEN
-const endpoint = process.env.GITHUB_MODELS_ENDPOINT || process.env.GITHUB_MODEL_ENDPOINT || 'https://models.inference.ai.azure.com'
-const model = process.env.MODEL_ID || 'gpt-5'
+
+// Azure OpenAI config
+const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT?.replace(/\/+$/, '')
+const azureKey = process.env.AZURE_OPENAI_KEY
+// Fallback: GitHub Models (legacy)
+const ghToken = process.env.GITHUB_MODELS_TOKEN || process.env.GITHUB_TOKEN
+const ghEndpoint = process.env.GITHUB_MODELS_ENDPOINT || 'https://models.inference.ai.azure.com'
+
+const model = process.env.MODEL_ID || 'gpt-5.4-mini'
+const apiVersion = process.env.AZURE_API_VERSION || '2025-01-01-preview'
+const MAX_RETRIES = 3
+
+function getApiConfig() {
+  if (azureEndpoint && azureKey) {
+    return {
+      url: `${azureEndpoint}/openai/deployments/${model}/chat/completions?api-version=${apiVersion}`,
+      headers: { 'api-key': azureKey, 'Content-Type': 'application/json' },
+      label: `Azure OpenAI (${model})`
+    }
+  }
+  if (ghToken) {
+    return {
+      url: `${ghEndpoint}/chat/completions`,
+      headers: { 'Authorization': `Bearer ${ghToken}`, 'Content-Type': 'application/json' },
+      label: `GitHub Models (${model})`
+    }
+  }
+  throw new Error('Missing credentials. Set AZURE_OPENAI_ENDPOINT+AZURE_OPENAI_KEY or GITHUB_MODELS_TOKEN.')
+}
 
 async function readList(filePath) {
   try {
@@ -15,49 +41,63 @@ async function readList(filePath) {
   }
 }
 
+async function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms))
+}
+
 async function translateMarkdown(markdown) {
-  if (!token) {
-    throw new Error('Missing token. Set env GITHUB_MODELS_TOKEN (CI) or GITHUB_TOKEN (local).')
-  }
+  const api = getApiConfig()
 
   const body = {
-    model,
     messages: [
       {
         role: 'system',
-        content: 'You are GitHub Copilot coding agent. Translate the provided Markdown from Simplified Chinese to native English. Preserve ALL Markdown/HTML tags, anchors, IDs, link targets, code blocks, and formatting. Do not change href/src, id values, or list/item structure. Output ONLY the translated Markdown.'
+        content: 'You are a professional translator. Translate the provided Markdown from Simplified Chinese to native English. Preserve ALL Markdown/HTML tags, anchors, IDs, link targets, code blocks, and formatting. Do not change href/src, id values, or list/item structure. Output ONLY the translated Markdown.'
       },
-      {
-        role: 'user',
-        content: markdown
-      }
+      { role: 'user', content: markdown }
     ]
   }
+  // GitHub Models needs model in body; Azure OpenAI uses deployment URL
+  if (!azureEndpoint) body.model = model
 
-  const res = await fetch(`${endpoint}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  })
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    const res = await fetch(api.url, {
+      method: 'POST',
+      headers: api.headers,
+      body: JSON.stringify(body)
+    })
 
-  if (!res.ok) {
-    const errTxt = await res.text()
-    throw new Error(`Model call failed: ${res.status} ${res.statusText} ${errTxt}`)
+    if (res.status === 429) {
+      const retryAfter = parseInt(res.headers.get('retry-after') || '60', 10)
+      const waitSec = Math.max(retryAfter, 30) * attempt
+      console.warn(`  429 rate limited, waiting ${waitSec}s (attempt ${attempt}/${MAX_RETRIES})...`)
+      await sleep(waitSec * 1000)
+      continue
+    }
+
+    if (!res.ok) {
+      const errTxt = await res.text()
+      if (attempt < MAX_RETRIES && res.status >= 500) {
+        console.warn(`  Server error ${res.status}, retrying in ${30 * attempt}s...`)
+        await sleep(30 * attempt * 1000)
+        continue
+      }
+      throw new Error(`API call failed: ${res.status} ${res.statusText} ${errTxt}`)
+    }
+
+    const data = await res.json()
+    const choice = (data.choices && data.choices[0]) || null
+    const content = choice?.message?.content ?? choice?.content
+    if (!content) throw new Error('No content returned from model')
+    return content
   }
 
-  const data = await res.json()
-  const choice = (data.choices && data.choices[0]) || null
-  const content = choice?.message?.content ?? choice?.content
-  if (!content) throw new Error('No content returned from model')
-  return content
+  throw new Error(`Failed after ${MAX_RETRIES} retries (rate limited)`)
 }
 
 async function main() {
-  console.log(`Using endpoint=${endpoint}`)
-  console.log(`Using model=${model}`)
+  const api = getApiConfig()
+  console.log(`Using: ${api.label}`)
   console.log(`Using listFile=${listFile}`)
 
   const zhFiles = await readList(listFile)
@@ -74,20 +114,18 @@ async function main() {
     try {
       await fs.access(zhPath)
 
-      // If the English file already exists, do not re-translate/overwrite.
       try {
         await fs.access(enPath)
         console.log(`Skip (en exists): ${zhPath} -> ${enPath}`)
         continue
-      } catch {
-        // en does not exist; proceed.
-      }
+      } catch { /* en does not exist; proceed */ }
 
       needTranslateCount++
+      console.log(`Translating: ${zhPath}...`)
       const src = await fs.readFile(zhPath, 'utf-8')
       const out = await translateMarkdown(src)
       await fs.writeFile(enPath, out, 'utf-8')
-      console.log(`Translated: ${zhPath} -> ${enPath}`)
+      console.log(`  Done: ${zhPath} -> ${enPath}`)
     } catch (e) {
       console.error(`Failed to translate ${zhPath}:`, e.message)
       process.exitCode = 1

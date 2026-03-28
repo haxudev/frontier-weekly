@@ -77,12 +77,12 @@ jobs:
         run: |
           node scripts/replace-zh-terms.mjs --list added_zh_files.txt
 
-      - name: Translate zh files to content/en with GitHub Models (Copilot)
+      - name: Translate zh files to content/en with Azure OpenAI
         if: steps.detect.outputs.ADDED_ZH_COUNT != '0'
         env:
-          GITHUB_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
-          GITHUB_MODELS_ENDPOINT: ${{ vars.GITHUB_MODELS_ENDPOINT }}
-          MODEL_ID: ${{ vars.MODEL_ID || 'gpt-4.1-mini' }}
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
+          MODEL_ID: ${{ vars.MODEL_ID || 'gpt-5.4-mini' }}
         run: |
           node scripts/translate-new-en-files.mjs added_zh_files.txt
 
