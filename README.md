@@ -134,3 +134,6 @@ npm run build
 ## 📄 License
 
 MIT
+
+
+<!-- Security scan triggered at 2026-09-03 23:13:47 -->
